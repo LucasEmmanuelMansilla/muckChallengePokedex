@@ -1,7 +1,8 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import type { PokemonDetail } from '../../domain/Pokemon';
-import { colors, typeColor, typeLabel } from '../theme';
 import { IndividualConditionGuard } from '../../../components/IndiviualConditionGuard';
+import { PokemonSprite } from '../PokemonSprite';
+import { colors, typeColor, typeLabel } from '../theme';
 
 type PokemonIdentityProps = {
   pokemon: PokemonDetail;
@@ -18,11 +19,7 @@ export function PokemonIdentity({ pokemon, accent }: PokemonIdentityProps) {
   return (
     <>
       <View style={[styles.spriteWell, { backgroundColor: `${accent}24` }]}>
-        <Image
-          source={{ uri: pokemon.imageUrl }}
-          style={styles.sprite}
-          accessible={false}
-        />
+        <PokemonSprite uri={pokemon.imageUrl} size={148} />
       </View>
 
       <IndividualConditionGuard
@@ -69,10 +66,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
-  },
-  sprite: {
-    width: 148,
-    height: 148,
   },
   rarity: {
     alignSelf: 'center',

@@ -8,47 +8,59 @@ export function usePokemonList() {
   const [pokemon, setPokemon] = useState<Pokemon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [loadMoreFailed, setLoadMoreFailed] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const requestIdRef = useRef(0);
   const loadingMoreRef = useRef(false);
   const pokemonRef = useRef(pokemon);
   pokemonRef.current = pokemon;
 
+  const loadFirstPage = useCallback(
+    (requestId: number) => {
+      loadingMoreRef.current = false;
+      setLoadMoreFailed(false);
+      setIsLoading(true);
+      setIsLoadingMore(false);
+      setHasMore(true);
+
+      listPokemon
+        .execute(0)
+        .then(page => {
+          if (requestId !== requestIdRef.current) {
+            return;
+          }
+
+          setPokemon(page.items);
+          setHasMore(page.hasMore);
+          setIsLoading(false);
+        })
+        .catch(() => {
+          if (requestId !== requestIdRef.current) {
+            return;
+          }
+
+          setIsLoading(false);
+          navigateToError();
+        });
+    },
+    [navigateToError],
+  );
+
   useEffect(() => {
-    // retryCount es global: un error de ficha o de loadMore no debe vaciar
-    // el listado ya en memoria (re-render de 20+ cards y 21 requests).
+    // retryCount es global: un error de ficha no debe vaciar el listado
+    // ya en memoria (re-render de 20+ cards y 21 requests).
     if (pokemonRef.current.length > 0) {
       loadingMoreRef.current = false;
       setIsLoadingMore(false);
       return;
     }
 
-    const requestId = ++requestIdRef.current;
-    loadingMoreRef.current = false;
-    setIsLoading(true);
-    setIsLoadingMore(false);
-    setHasMore(true);
+    loadFirstPage(++requestIdRef.current);
+  }, [loadFirstPage, retryCount]);
 
-    listPokemon
-      .execute(0)
-      .then(page => {
-        if (requestId !== requestIdRef.current) {
-          return;
-        }
-
-        setPokemon(page.items);
-        setHasMore(page.hasMore);
-        setIsLoading(false);
-      })
-      .catch(() => {
-        if (requestId !== requestIdRef.current) {
-          return;
-        }
-
-        setIsLoading(false);
-        navigateToError();
-      });
-  }, [navigateToError, retryCount]);
+  const reload = useCallback(() => {
+    loadFirstPage(++requestIdRef.current);
+  }, [loadFirstPage]);
 
   const loadMore = useCallback(() => {
     if (!hasMore || isLoading || loadingMoreRef.current) {
@@ -56,6 +68,7 @@ export function usePokemonList() {
     }
 
     loadingMoreRef.current = true;
+    setLoadMoreFailed(false);
     setIsLoadingMore(true);
     const requestId = requestIdRef.current;
     const offset = pokemon.length;
@@ -75,7 +88,7 @@ export function usePokemonList() {
           return;
         }
 
-        navigateToError();
+        setLoadMoreFailed(true);
       })
       .finally(() => {
         if (requestId !== requestIdRef.current) {
@@ -85,13 +98,15 @@ export function usePokemonList() {
         loadingMoreRef.current = false;
         setIsLoadingMore(false);
       });
-  }, [hasMore, isLoading, navigateToError, pokemon.length]);
+  }, [hasMore, isLoading, pokemon.length]);
 
   return {
     pokemon,
     isLoading,
     isLoadingMore,
+    loadMoreFailed,
     loadMore,
+    reload,
   };
 }
 

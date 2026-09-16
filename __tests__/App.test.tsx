@@ -20,6 +20,7 @@ import {
 } from './fixtures/pokemon';
 import {
   activeScreen,
+  flush,
   pressA11y,
   pressText,
   render,
@@ -151,15 +152,28 @@ describe('flujos de la app', () => {
       await Promise.resolve();
     });
 
-    expect(textOf(activeScreen(tree))).toContain(
-      '¡La Pokebola se abrió mal!',
+    const screen = textOf(activeScreen(tree));
+    expect(screen).toContain('No se pudieron cargar más Pokemones.');
+    expect(screen).toContain('Bulbasaur');
+    expect(screen).not.toContain('¡La Pokebola se abrió mal!');
+    expect(tree.root.findByType(FlatList).props.onEndReached).toBeUndefined();
+
+    listExecute.mockResolvedValue(
+      listPage([{ ...bulbasaur, id: 21, name: 'spearow' }], false),
     );
+    await pressA11y(tree, 'Reintentar carga');
+    await flush();
 
-    listExecute.mockResolvedValue(listPage([bulbasaur], false));
-    await pressText(tree, 'Reintentar captura');
-
-    expect(textOf(activeScreen(tree))).toContain('Bulbasaur');
-    expect(listExecute.mock.calls[0][0] ?? 0).toBe(0);
+    expect(listExecute).toHaveBeenCalledTimes(3);
+    expect(listExecute).toHaveBeenLastCalledWith(20);
+    expect(
+      tree.root
+        .findByType(FlatList)
+        .props.data.map((item: { name: string }) => item.name),
+    ).toContain('spearow');
+    expect(textOf(activeScreen(tree))).not.toContain(
+      'No se pudieron cargar más Pokemones.',
+    );
   });
 
   it('pide la página siguiente y no duplica si el offset se solapa', async () => {
@@ -409,5 +423,22 @@ describe('flujos de la app', () => {
     });
 
     expect(tree.root.findByType(FlatList).props.data).toHaveLength(20);
+  });
+
+  it('si la primera página viene vacía, se puede volver a buscar', async () => {
+    listExecute
+      .mockResolvedValueOnce(listPage([], false))
+      .mockResolvedValueOnce(listPage([bulbasaur]));
+
+    const tree = await renderApp(<App />);
+
+    expect(textOf(activeScreen(tree))).toContain('No se encontraron Pokemones');
+    expect(textOf(activeScreen(tree))).not.toContain('Cargando Pokédex…');
+
+    await pressText(tree, 'Volver a buscar');
+
+    expect(listExecute).toHaveBeenCalledTimes(2);
+    expect(textOf(activeScreen(tree))).toContain('Bulbasaur');
+    expect(textOf(activeScreen(tree))).not.toContain('No hay nadie por aquí');
   });
 });
