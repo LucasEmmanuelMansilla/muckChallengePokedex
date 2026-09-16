@@ -15,9 +15,11 @@ type PokedexScreenProps = {
 
 export function PokedexScreen({ header, children }: PokedexScreenProps) {
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, { paddingTop: statusBarInset() }]}>
       {header}
-      <View style={styles.body}>{children}</View>
+      <View style={[styles.body, { paddingBottom: navigationBarInset() }]}>
+        {children}
+      </View>
     </View>
   );
 }
@@ -44,7 +46,6 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: colors.primary,
-    paddingTop: statusBarInset(),
   },
   body: {
     flex: 1,
@@ -52,6 +53,5 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     overflow: 'hidden',
-    paddingBottom: navigationBarInset(),
   },
 });

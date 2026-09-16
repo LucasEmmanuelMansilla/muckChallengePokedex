@@ -25,7 +25,16 @@ class FakeHttpClient implements HttpClient {
 }
 
 function key(path: string, query?: Record<string, string | number>) {
-  return query ? `${path}?${JSON.stringify(query)}` : path;
+  if (!query) {
+    return path;
+  }
+
+  const params = Object.entries(query)
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([name, value]) => `${name}=${value}`)
+    .join('&');
+
+  return `${path}?${params}`;
 }
 
 describe('CachingHttpClient', () => {
@@ -39,6 +48,17 @@ describe('CachingHttpClient', () => {
 
     expect(first).toEqual({ id: 1 });
     expect(second).toEqual({ id: 1 });
+    expect(inner.calls).toHaveLength(1);
+  });
+
+  it('trata la misma query en distinto orden como la misma petición', async () => {
+    const inner = new FakeHttpClient();
+    inner.set('/pokemon', { results: [] }, { limit: 20, offset: 0 });
+    const client = new CachingHttpClient(inner);
+
+    await client.get('/pokemon', { offset: 0, limit: 20 });
+    await client.get('/pokemon', { limit: 20, offset: 0 });
+
     expect(inner.calls).toHaveLength(1);
   });
 
