@@ -1,27 +1,57 @@
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import HomeScreen from '../../screens/HomeScreen';
+import { StyleSheet, View } from 'react-native';
 import ErrorScreen from '../../screens/ErrorScreen';
+import HomeScreen from '../../screens/HomeScreen';
 import PokemonDetailScreen from '../../screens/PokemonDetailScreen';
-import {
-  navigationRef,
-  type RootStackParamList,
-} from './navigationRef';
-
-const Stack = createNativeStackNavigator<RootStackParamList>();
+import { useNavigation, type RootRoute } from './NavigationContext';
 
 export function RootNavigator() {
+  const { stack } = useNavigation();
+  const activeIndex = stack.length - 1;
+
   return (
-    <NavigationContainer ref={navigationRef}>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          statusBarStyle: 'light',
-        }}>
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="PokemonDetail" component={PokemonDetailScreen} />
-        <Stack.Screen name="Error" component={ErrorScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <View style={styles.root}>
+      {stack.map((route, index) => (
+        <View
+          key={screenKey(route, index)}
+          style={index === activeIndex ? styles.active : styles.hidden}
+          pointerEvents={index === activeIndex ? 'auto' : 'none'}>
+          {renderRoute(route)}
+        </View>
+      ))}
+    </View>
   );
 }
+
+function renderRoute(route: RootRoute) {
+  switch (route.name) {
+    case 'Home':
+      return <HomeScreen />;
+    case 'PokemonDetail':
+      return <PokemonDetailScreen pokemonId={route.pokemonId} />;
+    case 'Error':
+      return <ErrorScreen />;
+  }
+}
+
+function screenKey(route: RootRoute, index: number) {
+  switch (route.name) {
+    case 'Home':
+      return `home-${index}`;
+    case 'PokemonDetail':
+      return `detail-${route.pokemonId}-${index}`;
+    case 'Error':
+      return `error-${index}`;
+  }
+}
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
+  active: {
+    flex: 1,
+  },
+  hidden: {
+    display: 'none',
+  },
+});

@@ -1,4 +1,3 @@
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
   ActivityIndicator,
   Pressable,
@@ -7,22 +6,20 @@ import {
   View,
 } from 'react-native';
 import { ConditionGuard } from '../components/ConditionGuard';
-import type { RootStackParamList } from '../src/navigation/navigationRef';
+import { useNavigation } from '../src/navigation/NavigationContext';
 import { PokemonDetailView } from '../src/presentation/pokemonDetail/PokemonDetailView';
 import { PokedexScreen } from '../src/presentation/PokedexScreen';
 import { colors } from '../src/presentation/theme';
 import { usePokemonDetail } from '../src/presentation/usePokemonDetail';
 
-type PokemonDetailScreenProps = NativeStackScreenProps<
-  RootStackParamList,
-  'PokemonDetail'
->;
+type PokemonDetailScreenProps = {
+  pokemonId: number;
+};
 
 export default function PokemonDetailScreen({
-  navigation,
-  route,
+  pokemonId,
 }: PokemonDetailScreenProps) {
-  const { pokemonId } = route.params;
+  const { goBack } = useNavigation();
   const { pokemon, isLoading } = usePokemonDetail(pokemonId);
 
   return (
@@ -33,7 +30,7 @@ export default function PokemonDetailScreen({
           header={
             <View style={styles.header}>
               <Pressable
-                onPress={() => navigation.goBack()}
+                onPress={goBack}
                 hitSlop={12}
                 style={({ pressed }) => [
                   styles.backButton,
@@ -52,10 +49,7 @@ export default function PokemonDetailScreen({
           </View>
         </PokedexScreen>
       }>
-      <PokemonDetailView
-        pokemon={pokemon!}
-        onBack={() => navigation.goBack()}
-      />
+      <PokemonDetailView pokemon={pokemon!} onBack={goBack} />
     </ConditionGuard>
   );
 }
