@@ -23,8 +23,9 @@ export const PokemonCard = memo(function PokemonCard({
     <Pressable
       onPress={() => onPress(pokemon.id)}
       accessibilityRole="button"
-      accessibilityLabel={`Ver ficha de ${formatPokemonName(pokemon.name)}`}
-      style={({ pressed }) => [styles.shadow, pressed && styles.pressed]}>
+      accessibilityLabel={cardLabel(pokemon)}
+      style={({ pressed }) => [styles.shadow, pressed && styles.pressed]}
+    >
       <View style={styles.card}>
         <View style={[styles.accent, { backgroundColor: accent }]} />
         <View style={styles.body}>
@@ -35,7 +36,8 @@ export const PokemonCard = memo(function PokemonCard({
               {pokemon.types.map(type => (
                 <View
                   key={type}
-                  style={[styles.chip, { backgroundColor: typeColor(type) }]}>
+                  style={[styles.chip, { backgroundColor: typeColor(type) }]}
+                >
                   <Text style={styles.chipLabel}>{typeLabel(type)}</Text>
                 </View>
               ))}
@@ -54,7 +56,7 @@ export const PokemonCard = memo(function PokemonCard({
             <Image
               source={{ uri: pokemon.imageUrl }}
               style={styles.sprite}
-              accessibilityLabel={formatPokemonName(pokemon.name)}
+              accessible={false}
             />
           </View>
         </View>
@@ -62,6 +64,15 @@ export const PokemonCard = memo(function PokemonCard({
     </Pressable>
   );
 });
+
+function cardLabel(pokemon: Pokemon): string {
+  const name = formatPokemonName(pokemon.name);
+  const number = formatPokedexNumber(pokemon.id);
+  const types = pokemon.types.map(typeLabel).join(', ');
+  return types
+    ? `Ver ficha de ${name}, ${number}, ${types}`
+    : `Ver ficha de ${name}, ${number}`;
+}
 
 const styles = StyleSheet.create({
   pressed: {
@@ -121,7 +132,7 @@ const styles = StyleSheet.create({
   },
   chipLabel: {
     color: colors.chipText,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
   },
   metrics: {

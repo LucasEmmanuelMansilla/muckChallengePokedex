@@ -32,7 +32,6 @@ export function PokemonStats({ stats, accent }: PokemonStatsProps) {
   );
 }
 
-
 // Componente local que no se reutiliza en otro lugar
 function StatRow({
   label,
@@ -46,7 +45,11 @@ function StatRow({
   const ratio = Math.min(value / STAT_MAX, 1);
 
   return (
-    <View style={styles.statRow}>
+    <View
+      style={styles.statRow}
+      accessible
+      accessibilityLabel={`${label}, ${value}`}
+    >
       <Text style={styles.statLabel}>{label}</Text>
       <Text style={styles.statValue}>{value}</Text>
       <View style={styles.statTrack}>

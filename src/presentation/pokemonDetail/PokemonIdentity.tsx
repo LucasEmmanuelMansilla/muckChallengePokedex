@@ -1,6 +1,5 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
 import type { PokemonDetail } from '../../domain/Pokemon';
-import { formatPokemonName } from '../formatPokemon';
 import { colors, typeColor, typeLabel } from '../theme';
 import { IndividualConditionGuard } from '../../../components/IndiviualConditionGuard';
 
@@ -13,8 +12,8 @@ export function PokemonIdentity({ pokemon, accent }: PokemonIdentityProps) {
   const rarityLabel = pokemon.isMythical
     ? 'Pokémon singular'
     : pokemon.isLegendary
-      ? 'Pokémon legendario'
-      : null;
+    ? 'Pokémon legendario'
+    : null;
 
   return (
     <>
@@ -22,28 +21,33 @@ export function PokemonIdentity({ pokemon, accent }: PokemonIdentityProps) {
         <Image
           source={{ uri: pokemon.imageUrl }}
           style={styles.sprite}
-          accessibilityLabel={formatPokemonName(pokemon.name)}
+          accessible={false}
         />
       </View>
 
-      <IndividualConditionGuard 
+      <IndividualConditionGuard
         condition={!!rarityLabel}
-        children={<View style={styles.rarity}>
-          <Text style={styles.rarityLabel}>{rarityLabel}</Text>
-        </View>}
+        children={
+          <View style={styles.rarity}>
+            <Text style={styles.rarityLabel}>{rarityLabel}</Text>
+          </View>
+        }
       />
 
       <View style={styles.types}>
         {pokemon.types.map(type => (
           <View
             key={type}
-            style={[styles.chip, { backgroundColor: typeColor(type) }]}>
+            accessible
+            accessibilityLabel={`Tipo ${typeLabel(type)}`}
+            style={[styles.chip, { backgroundColor: typeColor(type) }]}
+          >
             <Text style={styles.chipLabel}>{typeLabel(type)}</Text>
           </View>
         ))}
       </View>
 
-      <IndividualConditionGuard 
+      <IndividualConditionGuard
         condition={!!pokemon.genus}
         children={<Text style={styles.genus}>{pokemon.genus}</Text>}
       />

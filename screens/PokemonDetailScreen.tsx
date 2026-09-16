@@ -31,24 +31,41 @@ export default function PokemonDetailScreen({
             <View style={styles.header}>
               <Pressable
                 onPress={goBack}
-                hitSlop={12}
+                hitSlop={8}
                 style={({ pressed }) => [
                   styles.backButton,
                   pressed && styles.backButtonPressed,
                 ]}
                 accessibilityRole="button"
-                accessibilityLabel="Volver al listado">
-                <Text style={styles.backGlyph}>‹</Text>
+                accessibilityLabel="Volver al listado"
+              >
+                <Text
+                  accessible={false}
+                  allowFontScaling={false}
+                  style={styles.backGlyph}
+                >
+                  ‹
+                </Text>
               </Pressable>
-              <Text style={styles.headerTitle}>Pokémon</Text>
+              <Text accessibilityRole="header" style={styles.headerTitle}>
+                Pokémon
+              </Text>
             </View>
-          }>
-          <View style={styles.loadingBody}>
+          }
+        >
+          <View
+            style={styles.loadingBody}
+            accessible
+            accessibilityRole="progressbar"
+            accessibilityLabel="Cargando ficha…"
+            accessibilityLiveRegion="polite"
+          >
             <ActivityIndicator color={colors.primary} size="large" />
             <Text style={styles.loadingLabel}>Cargando ficha…</Text>
           </View>
         </PokedexScreen>
-      }>
+      }
+    >
       <PokemonDetailView pokemon={pokemon!} onBack={goBack} />
     </ConditionGuard>
   );
@@ -64,8 +81,8 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
   },

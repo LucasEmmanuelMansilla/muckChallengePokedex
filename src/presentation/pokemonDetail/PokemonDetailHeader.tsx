@@ -17,18 +17,29 @@ export function PokemonDetailHeader({
     <View style={styles.header}>
       <Pressable
         onPress={onBack}
-        hitSlop={12}
+        hitSlop={8}
         style={({ pressed }) => [
           styles.backButton,
           pressed && styles.backButtonPressed,
         ]}
         accessibilityRole="button"
-        accessibilityLabel="Volver al listado">
-        <Text style={styles.backGlyph}>‹</Text>
+        accessibilityLabel="Volver al listado"
+      >
+        <Text
+          accessible={false}
+          allowFontScaling={false}
+          style={styles.backGlyph}
+        >
+          ‹
+        </Text>
       </Pressable>
       <View style={styles.headerCopy}>
         <Text style={styles.headerNumber}>{formatPokedexNumber(id)}</Text>
-        <Text style={styles.headerTitle} numberOfLines={1}>
+        <Text
+          accessibilityRole="header"
+          style={styles.headerTitle}
+          numberOfLines={1}
+        >
           {formatPokemonName(name)}
         </Text>
       </View>
@@ -46,8 +57,8 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -64,7 +75,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerNumber: {
-    color: colors.headerMuted,
+    color: colors.surface,
     fontSize: 12,
     fontWeight: '700',
     letterSpacing: 0.6,

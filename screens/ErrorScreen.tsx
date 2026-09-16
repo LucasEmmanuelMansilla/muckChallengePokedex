@@ -11,18 +11,25 @@ export default function ErrorScreen() {
     <PokedexScreen
       header={
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Pokédex</Text>
+          <Text accessibilityRole="header" style={styles.headerTitle}>
+            Pokédex
+          </Text>
         </View>
-      }>
+      }
+    >
       <View style={styles.body}>
         <View style={styles.badge}>
           <PokeBall size={88} />
         </View>
-        <Text style={styles.title}>¡La Pokebola se abrió mal!</Text>
-        <Text style={styles.message}>
-          No pudimos cargar los Pokemones. Revisá tu conexión e intentá de
-          nuevo.
-        </Text>
+        <View accessibilityRole="alert" accessibilityLiveRegion="assertive">
+          <Text accessibilityRole="header" style={styles.title}>
+            ¡La Pokebola se abrió mal!
+          </Text>
+          <Text style={styles.message}>
+            No pudimos cargar los Pokemones. Revisá tu conexión e intentá de
+            nuevo.
+          </Text>
+        </View>
         <Pressable
           onPress={retry}
           style={({ pressed }) => [
@@ -30,7 +37,7 @@ export default function ErrorScreen() {
             pressed && styles.buttonPressed,
           ]}
           accessibilityRole="button"
-          accessibilityLabel="Reintentar">
+        >
           <Text style={styles.buttonLabel}>Reintentar captura</Text>
         </Pressable>
       </View>
@@ -83,8 +90,10 @@ const styles = StyleSheet.create({
     marginTop: 28,
     backgroundColor: colors.primary,
     borderRadius: 999,
+    minHeight: 44,
     paddingHorizontal: 28,
     paddingVertical: 14,
+    justifyContent: 'center',
   },
   buttonPressed: {
     backgroundColor: colors.primaryDark,

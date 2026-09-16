@@ -10,7 +10,9 @@ type DetailSectionProps = {
 export function DetailSection({ title, children }: DetailSectionProps) {
   return (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
+      <Text accessibilityRole="header" style={styles.sectionTitle}>
+        {title}
+      </Text>
       {children}
     </View>
   );

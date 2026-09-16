@@ -4,33 +4,33 @@ export const colors = {
   primary: '#DE2C2C',
   primaryDark: '#9B1B1B',
   ink: '#1C1917',
-  muted: '#78716C',
+  muted: '#6F6964',
   line: '#E7E0D5',
   chipText: '#FFFFFF',
   errorSoft: '#FFF1F0',
-  headerMuted: '#FAD4D4',
   errorRing: '#F0C7C2',
 };
 
+// Oscurecidos para ≥ 4.5:1 con texto blanco (WCAG AA).
 export const TYPE_COLORS: Record<string, string> = {
-  normal: '#8F8C5E',
-  fire: '#EE8130',
-  water: '#4A86D8',
-  electric: '#C9A000',
-  grass: '#5EAA3C',
-  ice: '#4EA8A4',
+  normal: '#7A7750',
+  fire: '#B36124',
+  water: '#4277C0',
+  electric: '#8F7200',
+  grass: '#48832E',
+  ice: '#3C817E',
   fighting: '#C22E28',
   poison: '#A33EA1',
-  ground: '#B9922A',
-  flying: '#7E65D4',
-  psychic: '#E0487A',
-  bug: '#8A9A12',
-  rock: '#B6A136',
+  ground: '#8E7020',
+  flying: '#7860C9',
+  psychic: '#CC426F',
+  bug: '#707D0F',
+  rock: '#857627',
   ghost: '#735797',
   dragon: '#6F35FC',
   dark: '#705746',
   steel: '#6F6F95',
-  fairy: '#D06A98',
+  fairy: '#B15A81',
 };
 
 export const TYPE_LABELS: Record<string, string> = {
@@ -54,7 +54,7 @@ export const TYPE_LABELS: Record<string, string> = {
   fairy: 'Hada',
 };
 
-const FALLBACK_TYPE_COLOR = '#8F8C5E';
+const FALLBACK_TYPE_COLOR = TYPE_COLORS.normal;
 
 export function typeColor(type: string): string {
   return TYPE_COLORS[type] ?? FALLBACK_TYPE_COLOR;
