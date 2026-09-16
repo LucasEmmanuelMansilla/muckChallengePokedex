@@ -2,12 +2,15 @@ import { GetPokemon } from '../application/getPokemon';
 import { ListPokemon } from '../application/listPokemon';
 import { AsyncStorageCacheStore } from '../infrastructure/AsyncStorageCacheStore';
 import { CachedPokemonRepository } from '../infrastructure/CachedPokemonRepository';
+import { CachingHttpClient } from '../infrastructure/CachingHttpClient';
 import { FetchHttpClient } from '../infrastructure/FetchHttpClient';
 import { PokeApiPokemonRepository } from '../infrastructure/PokeApiPokemonRepository';
 
 const POKEMON_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
-const httpClient = new FetchHttpClient('https://pokeapi.co/api/v2', 6000);
+const httpClient = new CachingHttpClient(
+  new FetchHttpClient('https://pokeapi.co/api/v2', 6000),
+);
 
 const pokemonRepository = new CachedPokemonRepository(
   new PokeApiPokemonRepository(httpClient),

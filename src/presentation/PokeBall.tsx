@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Image } from 'react-native';
 
 const pokeBallImage = require('../assets/pokeball.png');
@@ -6,7 +7,7 @@ type PokeBallProps = {
   size?: number;
 };
 
-export function PokeBall({ size = 64 }: PokeBallProps) {
+export const PokeBall = memo(function PokeBall({ size = 64 }: PokeBallProps) {
   return (
     <Image
       source={pokeBallImage}
@@ -15,4 +16,4 @@ export function PokeBall({ size = 64 }: PokeBallProps) {
       style={{ width: size, height: size }}
     />
   );
-}
+});
