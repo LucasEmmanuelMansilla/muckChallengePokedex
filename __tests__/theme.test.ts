@@ -1,4 +1,7 @@
-import { typeColor, typeLabel } from '../src/presentation/theme';
+import {
+  typeColor,
+  typeLabel,
+} from '../src/presentation/theme';
 
 describe('tipos de Pokémon', () => {
   it('un tipo desconocido sigue siendo usable en la UI', () => {

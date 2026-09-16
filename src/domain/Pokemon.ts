@@ -1,8 +1,24 @@
+import type {
+  EggGroupName,
+  HabitatName,
+  PokemonType,
+  StatName,
+} from './pokemonCatalog';
+
+export type {
+  EggGroupName,
+  GenerationName,
+  GrowthRateName,
+  HabitatName,
+  PokemonType,
+  StatName,
+} from './pokemonCatalog';
+
 export type Pokemon = {
   id: number;
   name: string;
   imageUrl: string;
-  types: string[];
+  types: PokemonType[];
   heightMeters: number;
   weightKilograms: number;
 };
@@ -13,7 +29,7 @@ export type PokemonAbility = {
 };
 
 export type PokemonStat = {
-  name: string;
+  name: StatName;
   value: number;
 };
 
@@ -23,9 +39,9 @@ export type PokemonDetail = Pokemon & {
   abilities: PokemonAbility[];
   stats: PokemonStat[];
   baseExperience: number | null;
-  habitat: string | null;
+  habitat: HabitatName | null;
   captureRate: number;
-  eggGroups: string[];
+  eggGroups: EggGroupName[];
   // PokéAPI: -1 sin género; 0–8 octavos de probabilidad hembra.
   genderRate: number;
   isLegendary: boolean;

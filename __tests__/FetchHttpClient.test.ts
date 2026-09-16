@@ -64,12 +64,14 @@ describe('FetchHttpClient', () => {
 
     const client = new FetchHttpClient('https://pokeapi.co/api/v2', 1000);
     const pending = client.get('/pokemon');
-    const assertion = expect(pending).rejects.toMatchObject({
-      name: 'AbortError',
-    });
 
-    await jest.advanceTimersByTimeAsync(1000);
-    await assertion;
+    await Promise.all([
+      expect(pending).rejects.toMatchObject({
+        name: 'AppError',
+        code: 'timeout',
+      }),
+      jest.advanceTimersByTimeAsync(1000),
+    ]);
     jest.useRealTimers();
   });
 
@@ -82,6 +84,25 @@ describe('FetchHttpClient', () => {
 
     const client = new FetchHttpClient('https://pokeapi.co/api/v2', 6000);
 
-    await expect(client.get('/pokemon')).rejects.toThrow('HTTP 500');
+    await expect(client.get('/pokemon')).rejects.toMatchObject({
+      name: 'AppError',
+      code: 'network',
+      message: 'HTTP 500',
+    });
+  });
+
+  it('marca un 404 como recurso inexistente', async () => {
+    globalThis.fetch = jest.fn(async () => ({
+      ok: false,
+      status: 404,
+      json: async () => ({}),
+    })) as jest.Mock;
+
+    const client = new FetchHttpClient('https://pokeapi.co/api/v2', 6000);
+
+    await expect(client.get('/pokemon/0')).rejects.toMatchObject({
+      name: 'AppError',
+      code: 'not_found',
+    });
   });
 });

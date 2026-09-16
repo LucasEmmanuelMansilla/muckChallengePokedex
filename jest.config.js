@@ -8,8 +8,6 @@ module.exports = {
   ],
   collectCoverageFrom: [
     'App.{ts,tsx}',
-    'screens/**/*.{ts,tsx}',
-    'components/**/*.{ts,tsx}',
     'src/**/*.{ts,tsx}',
     '!src/domain/**',
     '!src/assets/**',

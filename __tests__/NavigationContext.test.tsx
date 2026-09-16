@@ -1,27 +1,34 @@
 import React from 'react';
 import { BackHandler, Pressable, Text } from 'react-native';
 import ReactTestRenderer from 'react-test-renderer';
+import { AppError } from '../src/domain/AppError';
 import {
   NavigationProvider,
   useNavigation,
 } from '../src/navigation/NavigationContext';
+import { useReloadSignal } from '../src/navigation/ReloadContext';
 import { pressA11y, render, textOf } from './helpers/render';
 
 function Probe() {
-  const { stack, retryCount, navigate, goBack, navigateToError, retry } =
-    useNavigation();
+  const { stack, navigate, goBack, navigateToError, retry } = useNavigation();
+  const { reloadCount } = useReloadSignal();
   const top = stack[stack.length - 1];
 
   return (
     <>
       <Text>{`ruta:${top?.name ?? 'ninguna'}`}</Text>
-      <Text>{`retry:${retryCount}`}</Text>
+      <Text>{`retry:${reloadCount}`}</Text>
       <Text>{`stack:${stack.length}`}</Text>
       <Pressable
         accessibilityLabel="abrir-ficha"
         onPress={() => navigate({ name: 'PokemonDetail', pokemonId: 1 })}
       />
-      <Pressable accessibilityLabel="abrir-error" onPress={navigateToError} />
+      <Pressable
+        accessibilityLabel="abrir-error"
+        onPress={() =>
+          navigateToError({ source: 'list', error: new AppError('network') })
+        }
+      />
       <Pressable accessibilityLabel="atras" onPress={goBack} />
       <Pressable accessibilityLabel="reintentar" onPress={retry} />
     </>

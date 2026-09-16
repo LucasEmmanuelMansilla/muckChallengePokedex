@@ -1,3 +1,18 @@
+import type {
+  EggGroupName,
+  GenerationName,
+  GrowthRateName,
+  HabitatName,
+  StatName,
+} from '../domain/pokemonCatalog';
+import {
+  isEggGroupName,
+  isGenerationName,
+  isGrowthRateName,
+  isHabitatName,
+  isStatName,
+} from '../domain/pokemonCatalog';
+
 export function formatPokemonName(name: string): string {
   return name
     .split('-')
@@ -15,7 +30,7 @@ export function formatMetric(value: number, unit: string): string {
   })} ${unit}`;
 }
 
-const STAT_LABELS: Record<string, string> = {
+const STAT_LABELS: Record<StatName, string> = {
   hp: 'PS',
   attack: 'Ataque',
   defense: 'Defensa',
@@ -25,10 +40,10 @@ const STAT_LABELS: Record<string, string> = {
 };
 
 export function statLabel(stat: string): string {
-  return STAT_LABELS[stat] ?? formatPokemonName(stat);
+  return isStatName(stat) ? STAT_LABELS[stat] : formatPokemonName(stat);
 }
 
-const HABITAT_LABELS: Record<string, string> = {
+const HABITAT_LABELS: Record<HabitatName, string> = {
   cave: 'Cueva',
   forest: 'Bosque',
   grassland: 'Pradera',
@@ -41,10 +56,12 @@ const HABITAT_LABELS: Record<string, string> = {
 };
 
 export function habitatLabel(habitat: string): string {
-  return HABITAT_LABELS[habitat] ?? formatPokemonName(habitat);
+  return isHabitatName(habitat)
+    ? HABITAT_LABELS[habitat]
+    : formatPokemonName(habitat);
 }
 
-const EGG_GROUP_LABELS: Record<string, string> = {
+const EGG_GROUP_LABELS: Record<EggGroupName, string> = {
   monster: 'Monstruo',
   water1: 'Agua 1',
   water2: 'Agua 2',
@@ -63,10 +80,12 @@ const EGG_GROUP_LABELS: Record<string, string> = {
 };
 
 export function eggGroupLabel(group: string): string {
-  return EGG_GROUP_LABELS[group] ?? formatPokemonName(group);
+  return isEggGroupName(group)
+    ? EGG_GROUP_LABELS[group]
+    : formatPokemonName(group);
 }
 
-const GENERATION_LABELS: Record<string, string> = {
+const GENERATION_LABELS: Record<GenerationName, string> = {
   'generation-i': 'I',
   'generation-ii': 'II',
   'generation-iii': 'III',
@@ -79,11 +98,14 @@ const GENERATION_LABELS: Record<string, string> = {
 };
 
 export function generationLabel(generation: string): string {
-  const roman = GENERATION_LABELS[generation];
-  return roman ? `Generación ${roman}` : formatPokemonName(generation);
+  if (!isGenerationName(generation)) {
+    return formatPokemonName(generation);
+  }
+
+  return `Generación ${GENERATION_LABELS[generation]}`;
 }
 
-const GROWTH_RATE_LABELS: Record<string, string> = {
+const GROWTH_RATE_LABELS: Record<GrowthRateName, string> = {
   slow: 'Lento',
   medium: 'Medio',
   fast: 'Rápido',
@@ -93,7 +115,9 @@ const GROWTH_RATE_LABELS: Record<string, string> = {
 };
 
 export function growthRateLabel(growthRate: string): string {
-  return GROWTH_RATE_LABELS[growthRate] ?? formatPokemonName(growthRate);
+  return isGrowthRateName(growthRate)
+    ? GROWTH_RATE_LABELS[growthRate]
+    : formatPokemonName(growthRate);
 }
 
 export function formatGender(genderRate: number): string {

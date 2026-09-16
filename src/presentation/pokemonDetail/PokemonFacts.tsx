@@ -9,7 +9,6 @@ import {
 } from '../formatPokemon';
 import { colors } from '../theme';
 import { DetailSection } from './DetailSection';
-import { IndividualConditionGuard } from '../../../components/IndiviualConditionGuard';
 
 type PokemonFactsProps = {
   pokemon: PokemonDetail;
@@ -32,10 +31,9 @@ export function PokemonFacts({ pokemon }: PokemonFactsProps) {
         <Fact label="Género" value={formatGender(pokemon.genderRate)} />
         <Fact label="Generación" value={generationLabel(pokemon.generation)} />
         <Fact label="Crecimiento" value={growthRateLabel(pokemon.growthRate)} />
-        <IndividualConditionGuard   
-          condition={pokemon.baseExperience != null}
-          children={<Fact label="Exp. base" value={String(pokemon.baseExperience)} />}
-        />
+        {pokemon.baseExperience != null ? (
+          <Fact label="Exp. base" value={String(pokemon.baseExperience)} />
+        ) : null}
       </View>
     </DetailSection>
   );

@@ -1,10 +1,18 @@
 import type { HttpClient } from '../domain/HttpClient';
+import {
+  isEggGroupName,
+  isHabitatName,
+  isPokemonType,
+  isStatName,
+} from '../domain/pokemonCatalog';
 import type {
+  HabitatName,
   Pokemon,
   PokemonAbility,
   PokemonDetail,
   PokemonListParams,
   PokemonRepository,
+  PokemonStat,
 } from '../domain/Pokemon';
 
 type NamedApiResource = {
@@ -76,8 +84,8 @@ export class PokeApiPokemonRepository implements PokemonRepository {
       { limit, offset },
     );
 
-    // El listado no trae tipos ni medidas; se piden en paralelo para armar la card.
-    return Promise.all(response.results.map(item => this.toPokemon(item)));
+    // El listado no trae tipos ni medidas; se piden en paralelo acotado para no abrir 20 sockets a la vez.
+    return mapPool(response.results, 6, item => this.toPokemon(item));
   }
 
   async getById(id: number): Promise<PokemonDetail> {
@@ -95,14 +103,16 @@ export class PokeApiPokemonRepository implements PokemonRepository {
       description: pickFlavorText(species.flavor_text_entries),
       genus: pickLocalized(species.genera, entry => entry.genus),
       abilities,
-      stats: pokemon.stats.map(entry => ({
-        name: entry.stat.name,
-        value: entry.base_stat,
-      })),
+      stats: pokemon.stats.flatMap(entry => {
+        const stat = toPokemonStat(entry.stat.name, entry.base_stat);
+        return stat ? [stat] : [];
+      }),
       baseExperience: pokemon.base_experience,
-      habitat: species.habitat?.name ?? null,
+      habitat: toHabitatName(species.habitat?.name),
       captureRate: species.capture_rate,
-      eggGroups: species.egg_groups.map(group => group.name),
+      eggGroups: species.egg_groups
+        .map(group => group.name)
+        .filter(isEggGroupName),
       genderRate: species.gender_rate,
       isLegendary: species.is_legendary,
       isMythical: species.is_mythical,
@@ -134,7 +144,8 @@ export class PokeApiPokemonRepository implements PokemonRepository {
       imageUrl: homeSpriteUrl(id),
       types: detail.types
         .sort((a, b) => a.slot - b.slot)
-        .map(entry => entry.type.name),
+        .map(entry => entry.type.name)
+        .filter(isPokemonType),
       heightMeters: detail.height / 10,
       weightKilograms: detail.weight / 10,
     };
@@ -160,6 +171,22 @@ export class PokeApiPokemonRepository implements PokemonRepository {
       }),
     );
   }
+}
+
+function toPokemonStat(name: string, value: number): PokemonStat | null {
+  if (!isStatName(name)) {
+    return null;
+  }
+
+  return { name, value };
+}
+
+function toHabitatName(name: string | undefined): HabitatName | null {
+  if (!name || !isHabitatName(name)) {
+    return null;
+  }
+
+  return name;
 }
 
 function idFromResourceUrl(url: string): number {
@@ -193,4 +220,32 @@ function pickFlavorText(
 
   const raw = byLang('es') ?? byLang('en') ?? '';
   return raw.replace(/[\f\n\r\t]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+async function mapPool<T, R>(
+  items: T[],
+  limit: number,
+  mapper: (item: T) => Promise<R>,
+): Promise<R[]> {
+  if (items.length === 0) {
+    return [];
+  }
+
+  const results = new Array<R>(items.length);
+  let cursor = 0;
+
+  async function worker() {
+    for (;;) {
+      const index = cursor;
+      cursor += 1;
+      if (index >= items.length) {
+        return;
+      }
+      results[index] = await mapper(items[index]);
+    }
+  }
+
+  const workerCount = Math.min(Math.max(limit, 1), items.length);
+  await Promise.all(Array.from({ length: workerCount }, () => worker()));
+  return results;
 }

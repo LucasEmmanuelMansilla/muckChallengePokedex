@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
-import ErrorScreen from '../../screens/ErrorScreen';
-import HomeScreen from '../../screens/HomeScreen';
-import PokemonDetailScreen from '../../screens/PokemonDetailScreen';
+import ErrorScreen from '../presentation/screens/ErrorScreen';
+import HomeScreen from '../presentation/screens/HomeScreen';
+import PokemonDetailScreen from '../presentation/screens/PokemonDetailScreen';
 import { useNavigation, type RootRoute } from './NavigationContext';
 
 export function RootNavigator() {

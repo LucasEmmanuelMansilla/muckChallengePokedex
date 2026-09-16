@@ -54,21 +54,18 @@ describe('PokemonDetailView', () => {
     expect(textOf(tree.root)).not.toContain('Pokémon legendario');
   });
 
-  it('un tipo nuevo de la API no rompe la ficha', async () => {
+  it('un stat fuera del rango típico no rompe la ficha', async () => {
     const tree = await render(
       <PokemonDetailView
         pokemon={{
           ...bulbasaurDetail,
-          types: ['stellar'],
           stats: [{ name: 'hp', value: 300 }],
         }}
         onBack={() => {}}
       />,
     );
-    const text = textOf(tree.root);
 
-    expect(text).toContain('stellar');
-    expect(text).toContain('300');
+    expect(textOf(tree.root)).toContain('300');
   });
 
   it('sin tipos conocidos sigue mostrando la ficha', async () => {

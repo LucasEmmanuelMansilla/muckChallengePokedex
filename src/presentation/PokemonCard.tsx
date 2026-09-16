@@ -1,11 +1,12 @@
 import { memo } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Pokemon } from '../domain/Pokemon';
 import {
   formatMetric,
   formatPokedexNumber,
   formatPokemonName,
 } from './formatPokemon';
+import { PokemonSprite } from './PokemonSprite';
 import { colors, typeColor, typeLabel } from './theme';
 
 type PokemonCardProps = {
@@ -24,6 +25,7 @@ export const PokemonCard = memo(function PokemonCard({
       onPress={() => onPress(pokemon.id)}
       accessibilityRole="button"
       accessibilityLabel={cardLabel(pokemon)}
+      accessibilityHint="Abre la ficha de este Pokémon"
       style={({ pressed }) => [styles.shadow, pressed && styles.pressed]}
     >
       <View style={styles.card}>
@@ -53,11 +55,7 @@ export const PokemonCard = memo(function PokemonCard({
             </View>
           </View>
           <View style={[styles.spriteWell, { backgroundColor: `${accent}24` }]}>
-            <Image
-              source={{ uri: pokemon.imageUrl }}
-              style={styles.sprite}
-              accessible={false}
-            />
+            <PokemonSprite uri={pokemon.imageUrl} size={88} />
           </View>
         </View>
       </View>
@@ -79,6 +77,7 @@ const styles = StyleSheet.create({
     opacity: 0.92,
   },
   shadow: {
+    flex: 1,
     borderRadius: 20,
     backgroundColor: colors.surface,
     shadowColor: colors.ink,
@@ -158,9 +157,5 @@ const styles = StyleSheet.create({
     borderRadius: 48,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  sprite: {
-    width: 88,
-    height: 88,
   },
 });

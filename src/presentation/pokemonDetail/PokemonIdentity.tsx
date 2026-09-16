@@ -1,7 +1,7 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import type { PokemonDetail } from '../../domain/Pokemon';
+import { PokemonSprite } from '../PokemonSprite';
 import { colors, typeColor, typeLabel } from '../theme';
-import { IndividualConditionGuard } from '../../../components/IndiviualConditionGuard';
 
 type PokemonIdentityProps = {
   pokemon: PokemonDetail;
@@ -18,21 +18,14 @@ export function PokemonIdentity({ pokemon, accent }: PokemonIdentityProps) {
   return (
     <>
       <View style={[styles.spriteWell, { backgroundColor: `${accent}24` }]}>
-        <Image
-          source={{ uri: pokemon.imageUrl }}
-          style={styles.sprite}
-          accessible={false}
-        />
+        <PokemonSprite uri={pokemon.imageUrl} size={148} />
       </View>
 
-      <IndividualConditionGuard
-        condition={!!rarityLabel}
-        children={
-          <View style={styles.rarity}>
-            <Text style={styles.rarityLabel}>{rarityLabel}</Text>
-          </View>
-        }
-      />
+      {rarityLabel ? (
+        <View style={styles.rarity}>
+          <Text style={styles.rarityLabel}>{rarityLabel}</Text>
+        </View>
+      ) : null}
 
       <View style={styles.types}>
         {pokemon.types.map(type => (
@@ -47,15 +40,13 @@ export function PokemonIdentity({ pokemon, accent }: PokemonIdentityProps) {
         ))}
       </View>
 
-      <IndividualConditionGuard
-        condition={!!pokemon.genus}
-        children={<Text style={styles.genus}>{pokemon.genus}</Text>}
-      />
+      {pokemon.genus ? (
+        <Text style={styles.genus}>{pokemon.genus}</Text>
+      ) : null}
 
-      <IndividualConditionGuard
-        condition={!!pokemon.description}
-        children={<Text style={styles.description}>{pokemon.description}</Text>}
-      />
+      {pokemon.description ? (
+        <Text style={styles.description}>{pokemon.description}</Text>
+      ) : null}
     </>
   );
 }
@@ -69,10 +60,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
-  },
-  sprite: {
-    width: 148,
-    height: 148,
   },
   rarity: {
     alignSelf: 'center',

@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
+import { toAppError } from '../domain/AppError';
 import { useNavigation } from '../navigation/NavigationContext';
+import { useReloadSignal } from '../navigation/ReloadContext';
 
 export function useRemoteData<T>(
   load: () => Promise<T>,
   resourceKey: string | number,
+  source: 'list' | 'detail' = 'detail',
 ) {
-  const { navigateToError, retryCount } = useNavigation();
+  const { navigateToError } = useNavigation();
+  const { reloadCount } = useReloadSignal();
   const loadRef = useRef(load);
   loadRef.current = load;
   const dataRef = useRef<T | undefined>(undefined);
@@ -29,18 +33,18 @@ export function useRemoteData<T>(
         setData(result);
         setIsLoading(false);
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (cancelled) {
           return;
         }
         setIsLoading(false);
-        navigateToError();
+        navigateToError({ source, error: toAppError(error) });
       });
 
     return () => {
       cancelled = true;
     };
-  }, [navigateToError, resourceKey, retryCount]);
+  }, [navigateToError, resourceKey, reloadCount, source]);
 
   return { data, isLoading };
 }
