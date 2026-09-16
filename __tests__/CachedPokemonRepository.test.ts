@@ -9,6 +9,10 @@ import { CachedPokemonRepository } from '../src/infrastructure/CachedPokemonRepo
 class MemoryCacheStore implements CacheStore {
   private readonly data = new Map<string, string>();
 
+  get size() {
+    return this.data.size;
+  }
+
   async get<T>(key: string): Promise<T | null> {
     const raw = this.data.get(key);
     return raw === undefined ? null : (JSON.parse(raw) as T);
@@ -78,7 +82,7 @@ function createSut(now: () => number, ttlMs = 1_000) {
   const cache = new MemoryCacheStore();
   const repository = new CachedPokemonRepository(remote, cache, ttlMs, now);
 
-  return { remote, repository };
+  return { remote, cache, repository };
 }
 
 describe('CachedPokemonRepository', () => {

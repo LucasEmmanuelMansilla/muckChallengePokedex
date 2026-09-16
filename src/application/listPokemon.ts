@@ -1,14 +1,24 @@
 import type { Pokemon, PokemonRepository } from '../domain/Pokemon';
 
-const FIRST_PAGE_LIMIT = 20;
+export const POKEMON_PAGE_SIZE = 20;
+
+export type PokemonListPage = {
+  items: Pokemon[];
+  hasMore: boolean;
+};
 
 export class ListPokemon {
   constructor(private readonly pokemonRepository: PokemonRepository) {}
 
-  execute(): Promise<Pokemon[]> {
-    return this.pokemonRepository.list({
-      limit: FIRST_PAGE_LIMIT,
-      offset: 0,
+  async execute(offset = 0): Promise<PokemonListPage> {
+    const items = await this.pokemonRepository.list({
+      limit: POKEMON_PAGE_SIZE,
+      offset,
     });
+
+    return {
+      items,
+      hasMore: items.length === POKEMON_PAGE_SIZE,
+    };
   }
 }
