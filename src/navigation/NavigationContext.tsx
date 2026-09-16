@@ -9,27 +9,42 @@ import {
   type ReactNode,
 } from 'react';
 import { BackHandler } from 'react-native';
+import type { AppError } from '../domain/AppError';
+import { ReloadProvider, useReloadSignal } from './ReloadContext';
 
 export type RootRoute =
   | { name: 'Home' }
   | { name: 'PokemonDetail'; pokemonId: number }
   | { name: 'Error' };
 
+export type LoadFailure = {
+  source: 'list' | 'detail';
+  error: AppError;
+};
+
 type NavigationValue = {
   stack: RootRoute[];
-  retryCount: number;
+  failure: LoadFailure | null;
   navigate: (route: RootRoute) => void;
   goBack: () => void;
-  navigateToError: () => void;
+  navigateToError: (failure: LoadFailure) => void;
   retry: () => void;
 };
 
 const NavigationContext = createContext<NavigationValue | null>(null);
 
 export function NavigationProvider({ children }: { children: ReactNode }) {
+  return (
+    <ReloadProvider>
+      <NavigationController>{children}</NavigationController>
+    </ReloadProvider>
+  );
+}
+
+function NavigationController({ children }: { children: ReactNode }) {
+  const { bumpReload } = useReloadSignal();
   const [stack, setStack] = useState<RootRoute[]>([{ name: 'Home' }]);
-  // Al reintentar, las pantallas que siguen montadas vuelven a pedir datos.
-  const [retryCount, setRetryCount] = useState(0);
+  const [failure, setFailure] = useState<LoadFailure | null>(null);
   const stackRef = useRef(stack);
   stackRef.current = stack;
 
@@ -41,7 +56,8 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
     setStack(current => (current.length > 1 ? current.slice(0, -1) : current));
   }, []);
 
-  const navigateToError = useCallback(() => {
+  const navigateToError = useCallback((nextFailure: LoadFailure) => {
+    setFailure(nextFailure);
     setStack(current =>
       current[current.length - 1]?.name === 'Error'
         ? current
@@ -50,11 +66,12 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const retry = useCallback(() => {
-    setRetryCount(count => count + 1);
+    bumpReload();
+    setFailure(null);
     setStack(current =>
       current.length > 1 ? current.slice(0, -1) : [{ name: 'Home' }],
     );
-  }, []);
+  }, [bumpReload]);
 
   useEffect(() => {
     const subscription = BackHandler.addEventListener(
@@ -81,13 +98,13 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
   const value = useMemo<NavigationValue>(
     () => ({
       stack,
-      retryCount,
+      failure,
       navigate,
       goBack,
       navigateToError,
       retry,
     }),
-    [stack, retryCount, navigate, goBack, navigateToError, retry],
+    [stack, failure, navigate, goBack, navigateToError, retry],
   );
 
   return (

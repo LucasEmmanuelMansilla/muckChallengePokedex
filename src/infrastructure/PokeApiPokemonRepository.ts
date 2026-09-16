@@ -76,8 +76,8 @@ export class PokeApiPokemonRepository implements PokemonRepository {
       { limit, offset },
     );
 
-    // El listado no trae tipos ni medidas; se piden en paralelo para armar la card.
-    return Promise.all(response.results.map(item => this.toPokemon(item)));
+    // El listado no trae tipos ni medidas; se piden en paralelo acotado para no abrir 20 sockets a la vez.
+    return mapPool(response.results, 6, item => this.toPokemon(item));
   }
 
   async getById(id: number): Promise<PokemonDetail> {
@@ -193,4 +193,32 @@ function pickFlavorText(
 
   const raw = byLang('es') ?? byLang('en') ?? '';
   return raw.replace(/[\f\n\r\t]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+async function mapPool<T, R>(
+  items: T[],
+  limit: number,
+  mapper: (item: T) => Promise<R>,
+): Promise<R[]> {
+  if (items.length === 0) {
+    return [];
+  }
+
+  const results = new Array<R>(items.length);
+  let cursor = 0;
+
+  async function worker() {
+    for (;;) {
+      const index = cursor;
+      cursor += 1;
+      if (index >= items.length) {
+        return;
+      }
+      results[index] = await mapper(items[index]);
+    }
+  }
+
+  const workerCount = Math.min(Math.max(limit, 1), items.length);
+  await Promise.all(Array.from({ length: workerCount }, () => worker()));
+  return results;
 }

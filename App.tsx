@@ -1,16 +1,23 @@
 import { StatusBar, StyleSheet, View } from 'react-native';
+import { getPokemon, listPokemon } from './src/di/container';
+import { PokemonUseCasesProvider } from './src/di/PokemonUseCasesContext';
 import { NavigationProvider } from './src/navigation/NavigationContext';
 import { RootNavigator } from './src/navigation/RootNavigator';
+import { AppErrorBoundary } from './src/presentation/AppErrorBoundary';
 import { colors } from './src/presentation/theme';
 
 function App() {
   return (
-    <NavigationProvider>
-      <View style={styles.container}>
-        <StatusBar barStyle="light-content" />
-        <RootNavigator />
-      </View>
-    </NavigationProvider>
+    <PokemonUseCasesProvider listPokemon={listPokemon} getPokemon={getPokemon}>
+      <NavigationProvider>
+        <View style={styles.container}>
+          <StatusBar barStyle="light-content" />
+          <AppErrorBoundary>
+            <RootNavigator />
+          </AppErrorBoundary>
+        </View>
+      </NavigationProvider>
+    </PokemonUseCasesProvider>
   );
 }
 

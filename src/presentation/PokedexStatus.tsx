@@ -6,6 +6,7 @@ type PokedexStatusProps = {
   title: string;
   message: string;
   actionLabel: string;
+  actionHint?: string;
   onAction: () => void;
   fill?: boolean;
 };
@@ -14,6 +15,7 @@ export function PokedexStatus({
   title,
   message,
   actionLabel,
+  actionHint = 'Vuelve a intentar la carga',
   onAction,
   fill = false,
 }: PokedexStatusProps) {
@@ -35,6 +37,7 @@ export function PokedexStatus({
           pressed && styles.buttonPressed,
         ]}
         accessibilityRole="button"
+        accessibilityHint={actionHint}
       >
         <Text style={styles.buttonLabel}>{actionLabel}</Text>
       </Pressable>

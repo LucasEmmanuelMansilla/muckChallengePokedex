@@ -6,19 +6,17 @@ import React from 'react';
 import { FlatList, Pressable } from 'react-native';
 import ReactTestRenderer from 'react-test-renderer';
 import App from '../App';
-import HomeScreen from '../screens/HomeScreen';
-import PokemonDetailScreen from '../screens/PokemonDetailScreen';
 import { getPokemon, listPokemon } from '../src/di/container';
-import {
-  NavigationProvider,
-  useNavigation,
-} from '../src/navigation/NavigationContext';
+import { useNavigation } from '../src/navigation/NavigationContext';
+import HomeScreen from '../src/presentation/screens/HomeScreen';
+import PokemonDetailScreen from '../src/presentation/screens/PokemonDetailScreen';
 import {
   bulbasaur,
   bulbasaurDetail,
   listPage,
 } from './fixtures/pokemon';
 import {
+  TestProviders,
   activeScreen,
   flush,
   pressA11y,
@@ -257,7 +255,7 @@ describe('flujos de la app', () => {
     await pressA11y(tree, cardLabel);
 
     expect(textOf(activeScreen(tree))).toContain(
-      '¡La Pokebola se abrió mal!',
+      'No pudimos cargar esta ficha',
     );
 
     await pressText(tree, 'Reintentar captura');
@@ -278,10 +276,10 @@ describe('flujos de la app', () => {
       .mockResolvedValueOnce(listPage([bulbasaur]));
 
     const tree = await renderApp(
-      <NavigationProvider>
+      <TestProviders>
         <HomeScreen />
         <RetryControl />
-      </NavigationProvider>,
+      </TestProviders>,
     );
 
     await pressA11y(tree, 'forzar-retry');
@@ -321,10 +319,10 @@ describe('flujos de la app', () => {
       .mockResolvedValueOnce(listPage([bulbasaur]));
 
     const tree = await renderApp(
-      <NavigationProvider>
+      <TestProviders>
         <HomeScreen />
         <RetryControl />
-      </NavigationProvider>,
+      </TestProviders>,
     );
 
     await pressA11y(tree, 'forzar-retry');
@@ -342,10 +340,10 @@ describe('flujos de la app', () => {
     getExecute.mockResolvedValue(bulbasaurDetail);
 
     const tree = await renderApp(
-      <NavigationProvider>
+      <TestProviders>
         <PokemonDetailScreen pokemonId={1} />
         <RetryControl />
-      </NavigationProvider>,
+      </TestProviders>,
     );
 
     expect(textOf(tree.root)).toContain('Pokémon Semilla');
@@ -366,9 +364,9 @@ describe('flujos de la app', () => {
     );
 
     const tree = await renderApp(
-      <NavigationProvider>
+      <TestProviders>
         <PokemonDetailScreen pokemonId={1} />
-      </NavigationProvider>,
+      </TestProviders>,
     );
 
     await ReactTestRenderer.act(async () => {
@@ -392,9 +390,9 @@ describe('flujos de la app', () => {
     );
 
     const tree = await renderApp(
-      <NavigationProvider>
+      <TestProviders>
         <PokemonDetailScreen pokemonId={1} />
-      </NavigationProvider>,
+      </TestProviders>,
     );
 
     await ReactTestRenderer.act(async () => {

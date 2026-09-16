@@ -1,10 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { listPokemon } from '../di/container';
+import { usePokemonUseCases } from '../di/PokemonUseCasesContext';
+import { toAppError } from '../domain/AppError';
 import type { Pokemon } from '../domain/Pokemon';
 import { useNavigation } from '../navigation/NavigationContext';
+import { useReloadSignal } from '../navigation/ReloadContext';
 
 export function usePokemonList() {
-  const { navigateToError, retryCount } = useNavigation();
+  const { listPokemon } = usePokemonUseCases();
+  const { navigateToError } = useNavigation();
+  const { reloadCount } = useReloadSignal();
   const [pokemon, setPokemon] = useState<Pokemon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -34,20 +38,20 @@ export function usePokemonList() {
           setHasMore(page.hasMore);
           setIsLoading(false);
         })
-        .catch(() => {
+        .catch((error: unknown) => {
           if (requestId !== requestIdRef.current) {
             return;
           }
 
           setIsLoading(false);
-          navigateToError();
+          navigateToError({ source: 'list', error: toAppError(error) });
         });
     },
-    [navigateToError],
+    [listPokemon, navigateToError],
   );
 
   useEffect(() => {
-    // retryCount es global: un error de ficha no debe vaciar el listado
+    // reloadCount es global: un error de ficha no debe vaciar el listado
     // ya en memoria (re-render de 20+ cards y 21 requests).
     if (pokemonRef.current.length > 0) {
       loadingMoreRef.current = false;
@@ -56,7 +60,7 @@ export function usePokemonList() {
     }
 
     loadFirstPage(++requestIdRef.current);
-  }, [loadFirstPage, retryCount]);
+  }, [loadFirstPage, reloadCount]);
 
   const reload = useCallback(() => {
     loadFirstPage(++requestIdRef.current);
@@ -98,7 +102,7 @@ export function usePokemonList() {
         loadingMoreRef.current = false;
         setIsLoadingMore(false);
       });
-  }, [hasMore, isLoading, pokemon.length]);
+  }, [hasMore, isLoading, listPokemon, pokemon.length]);
 
   return {
     pokemon,

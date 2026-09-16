@@ -25,6 +25,7 @@ export const PokemonCard = memo(function PokemonCard({
       onPress={() => onPress(pokemon.id)}
       accessibilityRole="button"
       accessibilityLabel={cardLabel(pokemon)}
+      accessibilityHint="Abre la ficha de este Pokémon"
       style={({ pressed }) => [styles.shadow, pressed && styles.pressed]}
     >
       <View style={styles.card}>

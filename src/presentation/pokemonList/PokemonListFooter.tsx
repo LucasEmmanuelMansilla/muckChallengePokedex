@@ -54,6 +54,7 @@ function ListLoadMoreError({ onRetry }: { onRetry: () => void }) {
         ]}
         accessibilityRole="button"
         accessibilityLabel="Reintentar carga"
+        accessibilityHint="Vuelve a pedir la siguiente página"
       >
         <Text style={styles.retryLabel}>Reintentar</Text>
       </Pressable>

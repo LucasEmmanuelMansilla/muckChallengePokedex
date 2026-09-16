@@ -1,9 +1,20 @@
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import TestRenderer, {
   type ReactTestInstance,
   type ReactTestRenderer,
 } from 'react-test-renderer';
+import { getPokemon, listPokemon } from '../../src/di/container';
+import { PokemonUseCasesProvider } from '../../src/di/PokemonUseCasesContext';
+import { NavigationProvider } from '../../src/navigation/NavigationContext';
+
+export function TestProviders({ children }: { children: ReactNode }) {
+  return (
+    <PokemonUseCasesProvider listPokemon={listPokemon} getPokemon={getPokemon}>
+      <NavigationProvider>{children}</NavigationProvider>
+    </PokemonUseCasesProvider>
+  );
+}
 
 export async function render(element: React.ReactElement) {
   let tree: ReactTestRenderer;

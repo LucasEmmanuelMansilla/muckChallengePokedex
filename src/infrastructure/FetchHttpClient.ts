@@ -1,3 +1,4 @@
+import { AppError, toAppError } from '../domain/AppError';
 import type { HttpClient } from '../domain/HttpClient';
 
 export class FetchHttpClient implements HttpClient {
@@ -20,10 +21,16 @@ export class FetchHttpClient implements HttpClient {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        if (response.status === 404) {
+          throw new AppError('not_found', 'HTTP 404');
+        }
+
+        throw new AppError('network', `HTTP ${response.status}`);
       }
 
       return (await response.json()) as T;
+    } catch (error) {
+      throw toAppError(error);
     } finally {
       clearTimeout(timeoutId);
     }

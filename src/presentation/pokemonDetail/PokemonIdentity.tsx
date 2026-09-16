@@ -1,6 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
 import type { PokemonDetail } from '../../domain/Pokemon';
-import { IndividualConditionGuard } from '../../../components/IndiviualConditionGuard';
 import { PokemonSprite } from '../PokemonSprite';
 import { colors, typeColor, typeLabel } from '../theme';
 
@@ -22,14 +21,11 @@ export function PokemonIdentity({ pokemon, accent }: PokemonIdentityProps) {
         <PokemonSprite uri={pokemon.imageUrl} size={148} />
       </View>
 
-      <IndividualConditionGuard
-        condition={!!rarityLabel}
-        children={
-          <View style={styles.rarity}>
-            <Text style={styles.rarityLabel}>{rarityLabel}</Text>
-          </View>
-        }
-      />
+      {rarityLabel ? (
+        <View style={styles.rarity}>
+          <Text style={styles.rarityLabel}>{rarityLabel}</Text>
+        </View>
+      ) : null}
 
       <View style={styles.types}>
         {pokemon.types.map(type => (
@@ -44,15 +40,13 @@ export function PokemonIdentity({ pokemon, accent }: PokemonIdentityProps) {
         ))}
       </View>
 
-      <IndividualConditionGuard
-        condition={!!pokemon.genus}
-        children={<Text style={styles.genus}>{pokemon.genus}</Text>}
-      />
+      {pokemon.genus ? (
+        <Text style={styles.genus}>{pokemon.genus}</Text>
+      ) : null}
 
-      <IndividualConditionGuard
-        condition={!!pokemon.description}
-        children={<Text style={styles.description}>{pokemon.description}</Text>}
-      />
+      {pokemon.description ? (
+        <Text style={styles.description}>{pokemon.description}</Text>
+      ) : null}
     </>
   );
 }

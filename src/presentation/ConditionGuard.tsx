@@ -6,6 +6,10 @@ type ConditionGuardProps = {
   children: ReactNode;
 };
 
-export function ConditionGuard({ when, component, children }: ConditionGuardProps) {
+export function ConditionGuard({
+  when,
+  component,
+  children,
+}: ConditionGuardProps) {
   return when ? component : children;
 }
