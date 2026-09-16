@@ -3,6 +3,7 @@ import { createNavigationContainerRef } from '@react-navigation/native';
 export type RootStackParamList = {
   Home: undefined;
   Error: undefined;
+  PokemonDetail: { pokemonId: number };
 };
 
 export const navigationRef = createNavigationContainerRef<RootStackParamList>();

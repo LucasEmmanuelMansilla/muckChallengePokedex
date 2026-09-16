@@ -1,16 +1,26 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Pokemon } from '../domain/Pokemon';
+import {
+  formatMetric,
+  formatPokedexNumber,
+  formatPokemonName,
+} from './formatPokemon';
 import { colors, typeColor, typeLabel } from './theme';
 
 type PokemonCardProps = {
   pokemon: Pokemon;
+  onPress: () => void;
 };
 
-export function PokemonCard({ pokemon }: PokemonCardProps) {
+export function PokemonCard({ pokemon, onPress }: PokemonCardProps) {
   const accent = typeColor(pokemon.types[0] ?? 'normal');
 
   return (
-    <View style={styles.shadow}>
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`Ver ficha de ${formatPokemonName(pokemon.name)}`}
+      style={({ pressed }) => [styles.shadow, pressed && styles.pressed]}>
       <View style={styles.card}>
         <View style={[styles.accent, { backgroundColor: accent }]} />
         <View style={styles.body}>
@@ -45,28 +55,14 @@ export function PokemonCard({ pokemon }: PokemonCardProps) {
           </View>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 }
 
-function formatPokemonName(name: string): string {
-  return name
-    .split('-')
-    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
-}
-
-function formatPokedexNumber(id: number): string {
-  return `N.º ${String(id).padStart(4, '0')}`;
-}
-
-function formatMetric(value: number, unit: string): string {
-  return `${value.toLocaleString('es-AR', {
-    maximumFractionDigits: 1,
-  })} ${unit}`;
-}
-
 const styles = StyleSheet.create({
+  pressed: {
+    opacity: 0.92,
+  },
   shadow: {
     borderRadius: 20,
     backgroundColor: colors.surface,

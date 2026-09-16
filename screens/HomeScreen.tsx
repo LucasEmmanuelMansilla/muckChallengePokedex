@@ -1,3 +1,5 @@
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   ActivityIndicator,
   FlatList,
@@ -5,43 +7,45 @@ import {
   Text,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { ConditionGuard } from '../components/ConditionGuard';
+import type { RootStackParamList } from '../src/navigation/navigationRef';
 import { PokeBall } from '../src/presentation/PokeBall';
 import { PokemonCard } from '../src/presentation/PokemonCard';
+import { PokedexScreen } from '../src/presentation/PokedexScreen';
 import { colors } from '../src/presentation/theme';
 import { usePokemonList } from '../src/presentation/usePokemonList';
 
 export default function HomeScreen() {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { pokemon, isLoading } = usePokemonList();
 
   return (
-    <ConditionGuard
-      when={isLoading}
-      component={
-        <SafeAreaView style={styles.screen} edges={['top']}>
-          <HomeHeader />
-          <View style={styles.listWrap}>
-            <View style={styles.centered}>
-              <ActivityIndicator color={colors.primary} size="large" />
-              <Text style={styles.loadingLabel}>Cargando Pokédex…</Text>
-            </View>
+    <PokedexScreen header={<HomeHeader />}>
+      <ConditionGuard
+        when={isLoading}
+        component={
+          <View style={styles.centered}>
+            <ActivityIndicator color={colors.primary} size="large" />
+            <Text style={styles.loadingLabel}>Cargando Pokédex…</Text>
           </View>
-        </SafeAreaView>
-      }>
-      <SafeAreaView style={styles.screen} edges={['top']}>
-        <HomeHeader />
-        <View style={styles.listWrap}>
-          <FlatList
-            data={pokemon}
-            keyExtractor={item => String(item.id)}
-            contentContainerStyle={styles.list}
-            ItemSeparatorComponent={() => <View style={styles.separator} />}
-            renderItem={({ item }) => <PokemonCard pokemon={item} />}
-          />
-        </View>
-      </SafeAreaView>
-    </ConditionGuard>
+        }>
+        <FlatList
+          data={pokemon}
+          keyExtractor={item => String(item.id)}
+          contentContainerStyle={styles.list}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          renderItem={({ item }) => (
+            <PokemonCard
+              pokemon={item}
+              onPress={() =>
+                navigation.navigate('PokemonDetail', { pokemonId: item.id })
+              }
+            />
+          )}
+        />
+      </ConditionGuard>
+    </PokedexScreen>
   );
 }
 
@@ -59,10 +63,6 @@ function HomeHeader() {
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.primary,
-  },
   header: {
     backgroundColor: colors.primary,
     paddingHorizontal: 20,
@@ -80,23 +80,10 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     letterSpacing: 0.4,
   },
-  subtitle: {
-    color: colors.headerMuted,
-    fontSize: 13,
-    fontWeight: '600',
-    marginTop: 2,
-  },
-  listWrap: {
-    flex: 1,
-    backgroundColor: colors.background,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    overflow: 'hidden',
-  },
   list: {
     paddingHorizontal: 16,
     paddingTop: 20,
-    paddingBottom: 32,
+    paddingBottom: 20,
   },
   separator: {
     height: 12,
