@@ -1,24 +1,27 @@
-import { StatusBar, StyleSheet, Text, View } from 'react-native';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { StatusBar, StyleSheet, View } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { RootNavigator } from './src/navigation/RootNavigator';
+import { queryClient } from './src/presentation/queryClient';
+import { colors } from './src/presentation/theme';
 
 function App() {
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <Text style={styles.title}>Hola mundo</Text>
-    </View>
+    <QueryClientProvider client={queryClient}>
+      <SafeAreaProvider>
+        <View style={styles.container}>
+          <StatusBar barStyle="light-content" />
+          <RootNavigator />
+        </View>
+      </SafeAreaProvider>
+    </QueryClientProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#ffffff',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '600',
+    backgroundColor: colors.background,
   },
 });
 
