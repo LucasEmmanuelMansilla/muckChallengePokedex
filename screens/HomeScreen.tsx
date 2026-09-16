@@ -1,5 +1,3 @@
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   ActivityIndicator,
   FlatList,
@@ -8,7 +6,7 @@ import {
   View,
 } from 'react-native';
 import { ConditionGuard } from '../components/ConditionGuard';
-import type { RootStackParamList } from '../src/navigation/navigationRef';
+import { useNavigation } from '../src/navigation/NavigationContext';
 import { PokeBall } from '../src/presentation/PokeBall';
 import { PokemonCard } from '../src/presentation/PokemonCard';
 import { PokedexScreen } from '../src/presentation/PokedexScreen';
@@ -16,8 +14,7 @@ import { colors } from '../src/presentation/theme';
 import { usePokemonList } from '../src/presentation/usePokemonList';
 
 export default function HomeScreen() {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation();
   const { pokemon, isLoading } = usePokemonList();
 
   return (
@@ -34,12 +31,15 @@ export default function HomeScreen() {
           data={pokemon}
           keyExtractor={item => String(item.id)}
           contentContainerStyle={styles.list}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          ItemSeparatorComponent={ListSeparator}
           renderItem={({ item }) => (
             <PokemonCard
               pokemon={item}
               onPress={() =>
-                navigation.navigate('PokemonDetail', { pokemonId: item.id })
+                navigation.navigate({
+                  name: 'PokemonDetail',
+                  pokemonId: item.id,
+                })
               }
             />
           )}
@@ -60,6 +60,10 @@ function HomeHeader() {
       </View>
     </View>
   );
+}
+
+function ListSeparator() {
+  return <View style={styles.separator} />;
 }
 
 const styles = StyleSheet.create({

@@ -1,25 +1,11 @@
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useQueryClient } from '@tanstack/react-query';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import type { RootStackParamList } from '../src/navigation/navigationRef';
+import { useNavigation } from '../src/navigation/NavigationContext';
 import { PokeBall } from '../src/presentation/PokeBall';
 import { PokedexScreen } from '../src/presentation/PokedexScreen';
 import { colors } from '../src/presentation/theme';
 
 export default function ErrorScreen() {
-  const queryClient = useQueryClient();
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-
-  const handleRetry = () => {
-    queryClient.invalidateQueries();
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-      return;
-    }
-    navigation.navigate('Home');
-  };
+  const { retry } = useNavigation();
 
   return (
     <PokedexScreen
@@ -32,13 +18,13 @@ export default function ErrorScreen() {
         <View style={styles.badge}>
           <PokeBall size={88} />
         </View>
-        <Text style={styles.title}>¡La Pokéball se abrió mal!</Text>
+        <Text style={styles.title}>¡La Pokebola se abrió mal!</Text>
         <Text style={styles.message}>
-          No pudimos cargar los Pokémon. Revisá tu conexión e intentá de
+          No pudimos cargar los Pokemones. Revisá tu conexión e intentá de
           nuevo.
         </Text>
         <Pressable
-          onPress={handleRetry}
+          onPress={retry}
           style={({ pressed }) => [
             styles.button,
             pressed && styles.buttonPressed,
