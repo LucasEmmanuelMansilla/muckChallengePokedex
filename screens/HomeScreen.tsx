@@ -40,11 +40,18 @@ export default function HomeScreen() {
       <ConditionGuard
         when={isLoading}
         component={
-          <View style={styles.centered}>
+          <View
+            style={styles.centered}
+            accessible
+            accessibilityRole="progressbar"
+            accessibilityLabel="Cargando Pokédex…"
+            accessibilityLiveRegion="polite"
+          >
             <ActivityIndicator color={colors.primary} size="large" />
             <Text style={styles.loadingLabel}>Cargando Pokédex…</Text>
           </View>
-        }>
+        }
+      >
         <FlatList
           data={pokemon}
           keyExtractor={keyExtractor}
@@ -71,7 +78,9 @@ const HomeHeader = memo(function HomeHeader() {
       <View style={styles.headerRow}>
         <PokeBall size={36} />
         <View>
-          <Text style={styles.title}>Pokédex</Text>
+          <Text accessibilityRole="header" style={styles.title}>
+            Pokédex
+          </Text>
         </View>
       </View>
     </View>
@@ -84,7 +93,13 @@ function ListSeparator() {
 
 function ListLoadingMore() {
   return (
-    <View style={styles.footer} accessibilityRole="progressbar">
+    <View
+      style={styles.footer}
+      accessible
+      accessibilityRole="progressbar"
+      accessibilityLabel="Cargando más Pokemones…"
+      accessibilityLiveRegion="polite"
+    >
       <ActivityIndicator color={colors.primary} />
       <Text style={styles.loadingLabel}>Cargando más Pokémon…</Text>
     </View>

@@ -11,7 +11,7 @@ export const PokeBall = memo(function PokeBall({ size = 64 }: PokeBallProps) {
   return (
     <Image
       source={pokeBallImage}
-      accessibilityLabel="Pokéball"
+      accessible={false}
       resizeMode="contain"
       style={{ width: size, height: size }}
     />

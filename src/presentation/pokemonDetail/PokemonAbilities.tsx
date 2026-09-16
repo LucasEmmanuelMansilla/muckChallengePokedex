@@ -16,7 +16,14 @@ export function PokemonAbilities({ abilities }: PokemonAbilitiesProps) {
     <DetailSection title="Habilidades">
       <View style={styles.abilityList}>
         {abilities.map(ability => (
-          <View key={`${ability.name}-${ability.isHidden}`} style={styles.ability}>
+          <View
+            key={`${ability.name}-${ability.isHidden}`}
+            style={styles.ability}
+            accessible={ability.isHidden}
+            accessibilityLabel={
+              ability.isHidden ? `${ability.name}, oculta` : undefined
+            }
+          >
             <Text style={styles.abilityName}>{ability.name}</Text>
             {ability.isHidden ? (
               <Text style={styles.abilityHint}>Oculta</Text>

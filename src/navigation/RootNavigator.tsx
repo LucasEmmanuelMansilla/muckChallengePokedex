@@ -14,7 +14,12 @@ export function RootNavigator() {
         <View
           key={screenKey(route, index)}
           style={index === activeIndex ? styles.active : styles.hidden}
-          pointerEvents={index === activeIndex ? 'auto' : 'none'}>
+          pointerEvents={index === activeIndex ? 'auto' : 'none'}
+          accessibilityElementsHidden={index !== activeIndex}
+          importantForAccessibility={
+            index === activeIndex ? 'auto' : 'no-hide-descendants'
+          }
+        >
           {renderRoute(route)}
         </View>
       ))}
