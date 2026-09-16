@@ -152,6 +152,20 @@ describe('CachedPokemonRepository', () => {
     expect(remote.listCalls).toBe(1);
   });
 
+  it('hidrata desde persistencia si la instancia no tiene memoria', async () => {
+    const remote = new FakePokemonRepository([bulbasaur], bulbasaurDetail);
+    const cache = new MemoryCacheStore();
+    const first = new CachedPokemonRepository(remote, cache, 1_000, () => 0);
+
+    await first.list({ limit: 20, offset: 0 });
+
+    const second = new CachedPokemonRepository(remote, cache, 1_000, () => 0);
+    const result = await second.list({ limit: 20, offset: 0 });
+
+    expect(result).toEqual([bulbasaur]);
+    expect(remote.listCalls).toBe(1);
+  });
+
   it('sirve desde memoria sin volver a persistencia ni red', async () => {
     const { remote, cache, repository } = createSut(() => 0);
 
