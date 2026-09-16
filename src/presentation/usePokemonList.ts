@@ -11,8 +11,18 @@ export function usePokemonList() {
   const [hasMore, setHasMore] = useState(true);
   const requestIdRef = useRef(0);
   const loadingMoreRef = useRef(false);
+  const pokemonRef = useRef(pokemon);
+  pokemonRef.current = pokemon;
 
   useEffect(() => {
+    // retryCount es global: un error de ficha o de loadMore no debe vaciar
+    // el listado ya en memoria (re-render de 20+ cards y 21 requests).
+    if (pokemonRef.current.length > 0) {
+      loadingMoreRef.current = false;
+      setIsLoadingMore(false);
+      return;
+    }
+
     const requestId = ++requestIdRef.current;
     loadingMoreRef.current = false;
     setIsLoading(true);

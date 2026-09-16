@@ -8,12 +8,14 @@ import { CachedPokemonRepository } from '../src/infrastructure/CachedPokemonRepo
 
 class MemoryCacheStore implements CacheStore {
   private readonly data = new Map<string, string>();
+  reads = 0;
 
   get size() {
     return this.data.size;
   }
 
   async get<T>(key: string): Promise<T | null> {
+    this.reads += 1;
     const raw = this.data.get(key);
     return raw === undefined ? null : (JSON.parse(raw) as T);
   }
@@ -138,5 +140,40 @@ describe('CachedPokemonRepository', () => {
     remote.detailError = new Error('network');
 
     await expect(repository.getById(1)).rejects.toThrow('network');
+  });
+
+  it('también persiste páginas siguientes del listado', async () => {
+    const { remote, repository } = createSut(() => 0);
+
+    await repository.list({ limit: 20, offset: 20 });
+    const result = await repository.list({ limit: 20, offset: 20 });
+
+    expect(result).toEqual([bulbasaur]);
+    expect(remote.listCalls).toBe(1);
+  });
+
+  it('sirve desde memoria sin volver a persistencia ni red', async () => {
+    const { remote, cache, repository } = createSut(() => 0);
+
+    await repository.list({ limit: 20, offset: 0 });
+    const readsAfterFirst = cache.reads;
+    const result = await repository.list({ limit: 20, offset: 0 });
+
+    expect(result).toEqual([bulbasaur]);
+    expect(remote.listCalls).toBe(1);
+    expect(cache.reads).toBe(readsAfterFirst);
+  });
+
+  it('comparte una sola petición remota si hay lecturas concurrentes', async () => {
+    const { remote, repository } = createSut(() => 0);
+
+    const [first, second] = await Promise.all([
+      repository.list({ limit: 20, offset: 0 }),
+      repository.list({ limit: 20, offset: 0 }),
+    ]);
+
+    expect(first).toEqual([bulbasaur]);
+    expect(second).toEqual([bulbasaur]);
+    expect(remote.listCalls).toBe(1);
   });
 });

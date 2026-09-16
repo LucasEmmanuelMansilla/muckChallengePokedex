@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -17,17 +17,17 @@ import { colors } from '../src/presentation/theme';
 import { usePokemonList } from '../src/presentation/usePokemonList';
 
 export default function HomeScreen() {
-  const navigation = useNavigation();
+  const { navigate } = useNavigation();
   const { pokemon, isLoading, isLoadingMore, loadMore } = usePokemonList();
 
   const handlePress = useCallback(
     (pokemonId: number) => {
-      navigation.navigate({
+      navigate({
         name: 'PokemonDetail',
         pokemonId,
       });
     },
-    [navigation],
+    [navigate],
   );
 
   const renderItem = useCallback<ListRenderItem<Pokemon>>(
@@ -65,7 +65,7 @@ export default function HomeScreen() {
   );
 }
 
-function HomeHeader() {
+const HomeHeader = memo(function HomeHeader() {
   return (
     <View style={styles.header}>
       <View style={styles.headerRow}>
@@ -76,7 +76,7 @@ function HomeHeader() {
       </View>
     </View>
   );
-}
+});
 
 function ListSeparator() {
   return <View style={styles.separator} />;

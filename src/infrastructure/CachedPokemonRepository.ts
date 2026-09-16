@@ -12,6 +12,9 @@ type CacheEntry<T> = {
 };
 
 export class CachedPokemonRepository implements PokemonRepository {
+  private readonly memory = new Map<string, CacheEntry<unknown>>();
+  private readonly inflight = new Map<string, Promise<unknown>>();
+
   constructor(
     private readonly remote: PokemonRepository,
     private readonly cache: CacheStore,
@@ -20,11 +23,6 @@ export class CachedPokemonRepository implements PokemonRepository {
   ) {}
 
   list(params: PokemonListParams): Promise<Pokemon[]> {
-    // Solo la primera página se persiste; el resto del listado es de sesión.
-    if (params.offset > 0) {
-      return this.remote.list(params);
-    }
-
     return this.readThrough(listCacheKey(params), () =>
       this.remote.list(params),
     );
@@ -38,23 +36,53 @@ export class CachedPokemonRepository implements PokemonRepository {
     key: string,
     fetchFresh: () => Promise<T>,
   ): Promise<T> {
-    const entry = await this.cache.get<CacheEntry<T>>(key);
+    const memoryEntry = this.memory.get(key) as CacheEntry<T> | undefined;
+    if (memoryEntry && this.now() - memoryEntry.storedAt < this.ttlMs) {
+      return memoryEntry.value;
+    }
+
+    const pending = this.inflight.get(key);
+    if (pending) {
+      return pending as Promise<T>;
+    }
+
+    const request = this.load(key, fetchFresh, memoryEntry);
+    this.inflight.set(key, request);
+
+    try {
+      return await request;
+    } finally {
+      this.inflight.delete(key);
+    }
+  }
+
+  private async load<T>(
+    key: string,
+    fetchFresh: () => Promise<T>,
+    memoryEntry: CacheEntry<T> | undefined,
+  ): Promise<T> {
+    const entry =
+      memoryEntry ?? (await this.cache.get<CacheEntry<T>>(key)) ?? undefined;
 
     // PokéAPI es estable: cache vigente evita red y mantiene la misma ficha.
-    if (entry !== null && this.now() - entry.storedAt < this.ttlMs) {
+    if (entry && this.now() - entry.storedAt < this.ttlMs) {
+      this.memory.set(key, entry);
       return entry.value;
     }
 
     try {
       const fresh = await fetchFresh();
-      await this.cache.set(key, {
+      const next: CacheEntry<T> = {
         storedAt: this.now(),
         value: fresh,
-      });
+      };
+      this.memory.set(key, next);
+      await this.cache.set(key, next);
       return fresh;
     } catch (error) {
       // Offline parcial: si hay dato previo se sirve aunque esté vencido.
       if (entry) {
+        this.memory.set(key, entry);
         return entry.value;
       }
 
