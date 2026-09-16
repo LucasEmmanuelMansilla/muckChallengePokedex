@@ -20,6 +20,11 @@ export class CachedPokemonRepository implements PokemonRepository {
   ) {}
 
   list(params: PokemonListParams): Promise<Pokemon[]> {
+    // Solo la primera página se persiste; el resto del listado es de sesión.
+    if (params.offset > 0) {
+      return this.remote.list(params);
+    }
+
     return this.readThrough(listCacheKey(params), () =>
       this.remote.list(params),
     );

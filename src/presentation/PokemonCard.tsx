@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Pokemon } from '../domain/Pokemon';
 import {
@@ -9,15 +10,18 @@ import { colors, typeColor, typeLabel } from './theme';
 
 type PokemonCardProps = {
   pokemon: Pokemon;
-  onPress: () => void;
+  onPress: (pokemonId: number) => void;
 };
 
-export function PokemonCard({ pokemon, onPress }: PokemonCardProps) {
+export const PokemonCard = memo(function PokemonCard({
+  pokemon,
+  onPress,
+}: PokemonCardProps) {
   const accent = typeColor(pokemon.types[0] ?? 'normal');
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => onPress(pokemon.id)}
       accessibilityRole="button"
       accessibilityLabel={`Ver ficha de ${formatPokemonName(pokemon.name)}`}
       style={({ pressed }) => [styles.shadow, pressed && styles.pressed]}>
@@ -57,7 +61,7 @@ export function PokemonCard({ pokemon, onPress }: PokemonCardProps) {
       </View>
     </Pressable>
   );
-}
+});
 
 const styles = StyleSheet.create({
   pressed: {
