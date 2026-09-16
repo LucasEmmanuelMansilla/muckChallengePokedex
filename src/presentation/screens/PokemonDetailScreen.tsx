@@ -1,6 +1,5 @@
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '../../navigation/NavigationContext';
-import { ConditionGuard } from '../ConditionGuard';
 import { PokedexBackButton } from '../PokedexBackButton';
 import { PokedexHeader } from '../PokedexHeader';
 import { PokedexScreen } from '../PokedexScreen';
@@ -18,34 +17,31 @@ export default function PokemonDetailScreen({
   const { goBack } = useNavigation();
   const { pokemon, isLoading } = usePokemonDetail(pokemonId);
 
-  return (
-    <ConditionGuard
-      when={isLoading || !pokemon}
-      component={
-        <PokedexScreen
-          header={
-            <PokedexHeader
-              title="Pokémon"
-              leading={<PokedexBackButton onPress={goBack} />}
-            />
-          }
+  if (isLoading || pokemon == null) {
+    return (
+      <PokedexScreen
+        header={
+          <PokedexHeader
+            title="Pokémon"
+            leading={<PokedexBackButton onPress={goBack} />}
+          />
+        }
+      >
+        <View
+          style={styles.loadingBody}
+          accessible
+          accessibilityRole="progressbar"
+          accessibilityLabel="Cargando ficha…"
+          accessibilityLiveRegion="polite"
         >
-          <View
-            style={styles.loadingBody}
-            accessible
-            accessibilityRole="progressbar"
-            accessibilityLabel="Cargando ficha…"
-            accessibilityLiveRegion="polite"
-          >
-            <ActivityIndicator color={colors.primary} size="large" />
-            <Text style={styles.loadingLabel}>Cargando ficha…</Text>
-          </View>
-        </PokedexScreen>
-      }
-    >
-      <PokemonDetailView pokemon={pokemon!} onBack={goBack} />
-    </ConditionGuard>
-  );
+          <ActivityIndicator color={colors.primary} size="large" />
+          <Text style={styles.loadingLabel}>Cargando ficha…</Text>
+        </View>
+      </PokedexScreen>
+    );
+  }
+
+  return <PokemonDetailView pokemon={pokemon} onBack={goBack} />;
 }
 
 const styles = StyleSheet.create({

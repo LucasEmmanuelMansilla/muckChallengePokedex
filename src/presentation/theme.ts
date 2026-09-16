@@ -1,3 +1,6 @@
+import type { PokemonType } from '../domain/pokemonCatalog';
+import { isPokemonType } from '../domain/pokemonCatalog';
+
 export const colors = {
   background: '#F6F1E8',
   surface: '#FFFFFF',
@@ -12,7 +15,7 @@ export const colors = {
 };
 
 // Oscurecidos para ≥ 4.5:1 con texto blanco (WCAG AA).
-export const TYPE_COLORS: Record<string, string> = {
+export const TYPE_COLORS: Record<PokemonType, string> = {
   normal: '#7A7750',
   fire: '#B36124',
   water: '#4277C0',
@@ -33,7 +36,7 @@ export const TYPE_COLORS: Record<string, string> = {
   fairy: '#B15A81',
 };
 
-export const TYPE_LABELS: Record<string, string> = {
+export const TYPE_LABELS: Record<PokemonType, string> = {
   normal: 'Normal',
   fire: 'Fuego',
   water: 'Agua',
@@ -57,9 +60,9 @@ export const TYPE_LABELS: Record<string, string> = {
 const FALLBACK_TYPE_COLOR = TYPE_COLORS.normal;
 
 export function typeColor(type: string): string {
-  return TYPE_COLORS[type] ?? FALLBACK_TYPE_COLOR;
+  return isPokemonType(type) ? TYPE_COLORS[type] : FALLBACK_TYPE_COLOR;
 }
 
 export function typeLabel(type: string): string {
-  return TYPE_LABELS[type] ?? type;
+  return isPokemonType(type) ? TYPE_LABELS[type] : type;
 }

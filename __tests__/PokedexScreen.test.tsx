@@ -74,12 +74,26 @@ describe('PokedexScreen', () => {
     trees.push(withNative);
     expect(styleOf(withNative.root.findAllByType(View)[0]).paddingTop).toBe(50);
     expect(styleOf(withNative.root.findAllByType(View)[1]).paddingBottom).toBe(
-      0,
+      34,
     );
 
     NativeModules.StatusBarManager = {};
     const fallback = await renderScreen();
     trees.push(fallback);
     expect(styleOf(fallback.root.findAllByType(View)[0]).paddingTop).toBe(47);
+    expect(styleOf(fallback.root.findAllByType(View)[1]).paddingBottom).toBe(
+      34,
+    );
+  });
+
+  it('en iOS sin notch no reserva el home indicator', async () => {
+    setPlatform('ios');
+    NativeModules.StatusBarManager = { HEIGHT: 20 };
+
+    const tree = await renderScreen();
+    trees.push(tree);
+
+    expect(styleOf(tree.root.findAllByType(View)[0]).paddingTop).toBe(20);
+    expect(styleOf(tree.root.findAllByType(View)[1]).paddingBottom).toBe(0);
   });
 });

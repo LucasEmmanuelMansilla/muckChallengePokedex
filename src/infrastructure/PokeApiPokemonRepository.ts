@@ -1,10 +1,18 @@
 import type { HttpClient } from '../domain/HttpClient';
+import {
+  isEggGroupName,
+  isHabitatName,
+  isPokemonType,
+  isStatName,
+} from '../domain/pokemonCatalog';
 import type {
+  HabitatName,
   Pokemon,
   PokemonAbility,
   PokemonDetail,
   PokemonListParams,
   PokemonRepository,
+  PokemonStat,
 } from '../domain/Pokemon';
 
 type NamedApiResource = {
@@ -95,14 +103,16 @@ export class PokeApiPokemonRepository implements PokemonRepository {
       description: pickFlavorText(species.flavor_text_entries),
       genus: pickLocalized(species.genera, entry => entry.genus),
       abilities,
-      stats: pokemon.stats.map(entry => ({
-        name: entry.stat.name,
-        value: entry.base_stat,
-      })),
+      stats: pokemon.stats.flatMap(entry => {
+        const stat = toPokemonStat(entry.stat.name, entry.base_stat);
+        return stat ? [stat] : [];
+      }),
       baseExperience: pokemon.base_experience,
-      habitat: species.habitat?.name ?? null,
+      habitat: toHabitatName(species.habitat?.name),
       captureRate: species.capture_rate,
-      eggGroups: species.egg_groups.map(group => group.name),
+      eggGroups: species.egg_groups
+        .map(group => group.name)
+        .filter(isEggGroupName),
       genderRate: species.gender_rate,
       isLegendary: species.is_legendary,
       isMythical: species.is_mythical,
@@ -134,7 +144,8 @@ export class PokeApiPokemonRepository implements PokemonRepository {
       imageUrl: homeSpriteUrl(id),
       types: detail.types
         .sort((a, b) => a.slot - b.slot)
-        .map(entry => entry.type.name),
+        .map(entry => entry.type.name)
+        .filter(isPokemonType),
       heightMeters: detail.height / 10,
       weightKilograms: detail.weight / 10,
     };
@@ -160,6 +171,22 @@ export class PokeApiPokemonRepository implements PokemonRepository {
       }),
     );
   }
+}
+
+function toPokemonStat(name: string, value: number): PokemonStat | null {
+  if (!isStatName(name)) {
+    return null;
+  }
+
+  return { name, value };
+}
+
+function toHabitatName(name: string | undefined): HabitatName | null {
+  if (!name || !isHabitatName(name)) {
+    return null;
+  }
+
+  return name;
 }
 
 function idFromResourceUrl(url: string): number {

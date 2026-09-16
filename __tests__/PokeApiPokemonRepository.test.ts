@@ -152,4 +152,32 @@ describe('PokeApiPokemonRepository', () => {
       { name: 'overgrow', isHidden: false },
     ]);
   });
+
+  it('descarta vocabularios de PokéAPI que aún no están en el catálogo', async () => {
+    const http = new RecordingHttpClient();
+    http.seed({
+      ...bulbasaurApi,
+      types: [
+        { slot: 1, name: 'grass' },
+        { slot: 2, name: 'stellar' },
+      ],
+      stats: [
+        { name: 'hp', value: 45 },
+        { name: 'accuracy', value: 30 },
+      ],
+      species: {
+        ...bulbasaurApi.species,
+        habitat: 'space',
+        eggGroups: ['monster', 'new-group'],
+      },
+    });
+    const repository = new PokeApiPokemonRepository(http);
+
+    const detail = await repository.getById(1);
+
+    expect(detail.types).toEqual(['grass']);
+    expect(detail.stats).toEqual([{ name: 'hp', value: 45 }]);
+    expect(detail.habitat).toBeNull();
+    expect(detail.eggGroups).toEqual(['monster']);
+  });
 });

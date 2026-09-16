@@ -8,6 +8,11 @@ import {
 } from 'react-native';
 import { colors } from './theme';
 
+const ANDROID_NAVIGATION_BAR_DP = 48;
+const IOS_HOME_INDICATOR_PT = 34;
+const IOS_STATUS_BAR_FALLBACK = 47;
+const IOS_CLASSIC_STATUS_BAR = 20;
+
 type PokedexScreenProps = {
   header: ReactNode;
   children: ReactNode;
@@ -29,17 +34,24 @@ function statusBarInset(): number {
     return StatusBar.currentHeight ?? 0;
   }
 
-  const height = NativeModules.StatusBarManager?.HEIGHT;
-  return typeof height === 'number' ? height : 47;
+  return iosStatusBarHeight();
 }
 
 function navigationBarInset(): number {
-  if (Platform.OS !== 'android') {
-    return 0;
+  if (Platform.OS === 'android') {
+    // Edge-to-edge dibuja debajo de la barra de 3 botones; 48dp es su altura Material.
+    return ANDROID_NAVIGATION_BAR_DP;
   }
 
-  // Edge-to-edge dibuja debajo de la barra de 3 botones; 48dp es su altura Material.
-  return 48;
+  // Home indicator (~34pt) en iPhone con notch / Dynamic Island.
+  return iosStatusBarHeight() > IOS_CLASSIC_STATUS_BAR
+    ? IOS_HOME_INDICATOR_PT
+    : 0;
+}
+
+function iosStatusBarHeight(): number {
+  const height = NativeModules.StatusBarManager?.HEIGHT;
+  return typeof height === 'number' ? height : IOS_STATUS_BAR_FALLBACK;
 }
 
 const styles = StyleSheet.create({
