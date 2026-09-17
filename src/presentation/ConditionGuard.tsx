@@ -6,6 +6,10 @@ type ConditionGuardProps = {
   children: ReactNode;
 };
 
+/**
+ * Swap del cuerpo (skeleton vs lista) sin que HomeScreen anide un ternario
+ * alrededor del chrome. El header vive en PokedexScreen y no parpadea.
+ */
 export function ConditionGuard({
   when,
   component,

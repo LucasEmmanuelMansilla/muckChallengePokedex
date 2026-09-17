@@ -5,6 +5,10 @@ import type { Pokemon } from '../domain/Pokemon';
 import { useNavigation } from '../navigation/NavigationContext';
 import { useReloadSignal } from '../navigation/ReloadContext';
 
+/**
+ * Paginación aparte de `useRemoteData`: un fallo de "cargar más" no debe
+ * cubrir el listado con ErrorScreen (el usuario ya ve 20+ cards).
+ */
 export function usePokemonList() {
   const { listPokemon } = usePokemonUseCases();
   const { navigateToError } = useNavigation();
@@ -14,7 +18,10 @@ export function usePokemonList() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [loadMoreFailed, setLoadMoreFailed] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  // Distingue respuestas de un reload anterior (Strict Mode / retry rápido).
   const requestIdRef = useRef(0);
+  // FlatList puede disparar onEndReached dos veces; el ref corta el segundo
+  // fetch antes de que React reciba el setState de isLoadingMore.
   const loadingMoreRef = useRef(false);
   const pokemonRef = useRef(pokemon);
   pokemonRef.current = pokemon;
@@ -92,6 +99,7 @@ export function usePokemonList() {
           return;
         }
 
+        // El listado sigue visible; solo el footer ofrece reintentar.
         setLoadMoreFailed(true);
       })
       .finally(() => {
@@ -119,6 +127,7 @@ function appendUnique(current: Pokemon[], incoming: Pokemon[]): Pokemon[] {
     return current;
   }
 
+  // Un retry de página o un overlap de offset no debe duplicar cards.
   const seen = new Set(current.map(item => item.id));
   const extra = incoming.filter(item => !seen.has(item.id));
   return extra.length === 0 ? current : [...current, ...extra];

@@ -18,6 +18,7 @@ export function PokedexBackButton({ onPress }: PokedexBackButtonProps) {
       accessibilityLabel="Volver al listado"
       accessibilityHint="Regresa al listado de la Pokédex"
     >
+      {/* El botón ya tiene label; el glifo ‹ no debe leerse como "menor que". */}
       <Text accessible={false} allowFontScaling={false} style={styles.backGlyph}>
         ‹
       </Text>
@@ -27,6 +28,7 @@ export function PokedexBackButton({ onPress }: PokedexBackButtonProps) {
 
 const styles = StyleSheet.create({
   backButton: {
+    // 44 dp: mínimo táctil de HIG / WCAG. hitSlop suma margen alrededor.
     width: 44,
     height: 44,
     alignItems: 'center',

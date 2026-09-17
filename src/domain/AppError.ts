@@ -1,3 +1,8 @@
+/**
+ * Códigos cerrados para que la UI elija copy sin inspeccionar mensajes
+ * de fetch ni status HTTP. `unknown` es el cajón para no dejar un error
+ * sin código y forzar un estado de error genérico.
+ */
 export type AppErrorCode = 'network' | 'timeout' | 'not_found' | 'unknown';
 
 export class AppError extends Error {
@@ -15,6 +20,7 @@ export function toAppError(error: unknown): AppError {
     return error;
   }
 
+  // FetchHttpClient aborta por deadline; AbortError es timeout, no "red caída".
   if (isAbortError(error)) {
     return new AppError('timeout');
   }

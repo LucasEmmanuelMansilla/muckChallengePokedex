@@ -1,3 +1,8 @@
+/**
+ * Puente entre el composition root y la UI. Los hooks dependen de este
+ * context y no de `container.ts`, así presentation no instancia adapters
+ * y los tests pueden pasar casos de uso fake.
+ */
 import {
   createContext,
   useContext,

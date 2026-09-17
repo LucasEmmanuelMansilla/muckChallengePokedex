@@ -39,7 +39,7 @@ export function PokemonFacts({ pokemon }: PokemonFactsProps) {
   );
 }
 
-// Componente local que no se reutiliza en otro lugar
+// Se queda en este archivo: es layout de esta grilla, no un átomo de UI.
 function Fact({ label, value }: { label: string; value: string }) {
   return (
     <View style={styles.fact}>

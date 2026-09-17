@@ -12,6 +12,11 @@ import { BackHandler } from 'react-native';
 import type { AppError } from '../domain/AppError';
 import { ReloadProvider, useReloadSignal } from './ReloadContext';
 
+/**
+ * Stack en memoria en lugar de React Navigation: el challenge restringe
+ * libs y con 3 rutas no hace falta deep linking. Las pantallas previas
+ * siguen montadas (ver RootNavigator) para no perder scroll ni refetch.
+ */
 export type RootRoute =
   | { name: 'Home' }
   | { name: 'PokemonDetail'; pokemonId: number }
@@ -45,6 +50,8 @@ function NavigationController({ children }: { children: ReactNode }) {
   const { bumpReload } = useReloadSignal();
   const [stack, setStack] = useState<RootRoute[]>([{ name: 'Home' }]);
   const [failure, setFailure] = useState<LoadFailure | null>(null);
+  // El listener de BackHandler se registra una vez; el ref evita una
+  // closure con el stack viejo sin re-suscribir en cada navegación.
   const stackRef = useRef(stack);
   stackRef.current = stack;
 
@@ -58,6 +65,7 @@ function NavigationController({ children }: { children: ReactNode }) {
 
   const navigateToError = useCallback((nextFailure: LoadFailure) => {
     setFailure(nextFailure);
+    // Un segundo fallo no apila otra Error: actualiza el copy y listo.
     setStack(current =>
       current[current.length - 1]?.name === 'Error'
         ? current
@@ -66,6 +74,8 @@ function NavigationController({ children }: { children: ReactNode }) {
   }, []);
 
   const retry = useCallback(() => {
+    // Error queda encima de Home/ficha: pop + bumpReload reintenta sin
+    // desmontar el listado (evita re-pedir las 20 cards).
     bumpReload();
     setFailure(null);
     setStack(current =>
@@ -88,6 +98,7 @@ function NavigationController({ children }: { children: ReactNode }) {
           return true;
         }
 
+        // false = el sistema sale de la app (estamos en Home).
         return false;
       },
     );

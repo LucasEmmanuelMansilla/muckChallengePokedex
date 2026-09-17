@@ -17,6 +17,8 @@ export default function PokemonDetailScreen({
   const { goBack } = useNavigation();
   const { pokemon, isLoading } = usePokemonDetail(pokemonId);
 
+  // El chrome (volver) se pinta ya en loading: no hay que esperar la ficha
+  // para salir. El ErrorBoundary no cubre este fetch; va a ErrorScreen.
   if (isLoading || pokemon == null) {
     return (
       <PokedexScreen

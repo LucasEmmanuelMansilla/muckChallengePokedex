@@ -19,6 +19,8 @@ export function PokemonAbilities({ abilities }: PokemonAbilitiesProps) {
           <View
             key={`${ability.name}-${ability.isHidden}`}
             style={styles.ability}
+            // Agrupa nombre + "Oculta" en un solo anuncio; si no es oculta
+            // el Text basta y el contenedor no debe robar el foco.
             accessible={ability.isHidden}
             accessibilityLabel={
               ability.isHidden ? `${ability.name}, oculta` : undefined

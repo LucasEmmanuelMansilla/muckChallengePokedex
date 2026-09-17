@@ -8,6 +8,10 @@ import { PokedexListLoading } from '../pokemonList/PokedexListLoading';
 import { PokemonList } from '../pokemonList/PokemonList';
 import { usePokemonList } from '../usePokemonList';
 
+/**
+ * Solo cablea chrome + lista. El fetch vive en `usePokemonList` para que
+ * esta pantalla no sepa de paginación ni de ErrorScreen.
+ */
 export default function HomeScreen() {
   const { navigate } = useNavigation();
   const {

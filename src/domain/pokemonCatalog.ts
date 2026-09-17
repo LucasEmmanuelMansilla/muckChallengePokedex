@@ -1,3 +1,8 @@
+/**
+ * Vocabularios cerrados en dominio (no en la UI) para filtrar strings
+ * desconocidos de PokéAPI sin Zod. Un tipo/stat nuevo no rompe el mapeo:
+ * se descarta o se muestra con fallback, según el campo.
+ */
 export const POKEMON_TYPES = [
   'normal',
   'fire',

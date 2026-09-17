@@ -4,6 +4,7 @@ import { statLabel } from '../formatPokemon';
 import { colors } from '../theme';
 import { DetailSection } from './DetailSection';
 
+// Techo de stats base en los juegos: las barras quedan comparables entre fichas.
 const STAT_MAX = 255;
 
 type PokemonStatsProps = {
@@ -32,7 +33,7 @@ export function PokemonStats({ stats, accent }: PokemonStatsProps) {
   );
 }
 
-// Componente local que no se reutiliza en otro lugar
+// Se queda acá: la fila (label + valor + barra) no se usa fuera de stats.
 function StatRow({
   label,
   value,

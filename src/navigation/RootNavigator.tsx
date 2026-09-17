@@ -4,6 +4,11 @@ import HomeScreen from '../presentation/screens/HomeScreen';
 import PokemonDetailScreen from '../presentation/screens/PokemonDetailScreen';
 import { useNavigation, type RootRoute } from './NavigationContext';
 
+/**
+ * Cada ruta queda montada con `display: none` en vez de desmontar.
+ * Volver de la ficha no re-pide las 20 cards ni pierde la posición del
+ * FlatList. pointerEvents/a11y ocultan las pantallas de atrás al lector.
+ */
 export function RootNavigator() {
   const { stack } = useNavigation();
   const activeIndex = stack.length - 1;

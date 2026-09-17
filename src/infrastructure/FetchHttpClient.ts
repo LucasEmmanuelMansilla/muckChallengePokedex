@@ -1,6 +1,10 @@
 import { AppError, toAppError } from '../domain/AppError';
 import type { HttpClient } from '../domain/HttpClient';
 
+/**
+ * Adapter de `fetch` nativo (el challenge no admite Axios). El timeout va
+ * por AbortController porque React Native no tiene timeout en fetch.
+ */
 export class FetchHttpClient implements HttpClient {
   constructor(
     private readonly baseUrl: string,
@@ -28,6 +32,8 @@ export class FetchHttpClient implements HttpClient {
         throw new AppError('network', `HTTP ${response.status}`);
       }
 
+      // Sin Zod (restricción de libs): el adapter filtra vocabularios
+      // desconocidos al mapear, no en el JSON crudo.
       return (await response.json()) as T;
     } catch (error) {
       throw toAppError(error);

@@ -11,6 +11,11 @@ type CacheEntry<T> = {
   value: T;
 };
 
+/**
+ * Caché del modelo de dominio (no del JSON de PokéAPI). Memoria para el
+ * session, AsyncStorage para reabrir la app. El HTTP cacheado no alcanza:
+ * ahí el dato aún no está mapeado y muere al matar el proceso.
+ */
 export class CachedPokemonRepository implements PokemonRepository {
   private readonly memory = new Map<string, CacheEntry<unknown>>();
   private readonly inflight = new Map<string, Promise<unknown>>();
@@ -19,6 +24,7 @@ export class CachedPokemonRepository implements PokemonRepository {
     private readonly remote: PokemonRepository,
     private readonly cache: CacheStore,
     private readonly ttlMs: number,
+    // Inyectable para tests de TTL sin fake timers globales.
     private readonly now: () => number = Date.now,
   ) {}
 
@@ -91,6 +97,7 @@ export class CachedPokemonRepository implements PokemonRepository {
   }
 }
 
+// Prefijo versionado: un cambio de forma del modelo se descarta sin migración.
 const CACHE_VERSION = 'v1';
 
 function listCacheKey({ limit, offset }: PokemonListParams): string {

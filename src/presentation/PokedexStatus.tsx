@@ -8,6 +8,7 @@ type PokedexStatusProps = {
   actionLabel: string;
   actionHint?: string;
   onAction: () => void;
+  // true: ErrorScreen (ocupa el body). false: empty del FlatList (inline).
   fill?: boolean;
 };
 

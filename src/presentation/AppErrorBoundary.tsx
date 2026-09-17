@@ -12,6 +12,10 @@ type AppErrorBoundaryState = {
   hasError: boolean;
 };
 
+/**
+ * Los error boundaries de React solo existen como class components.
+ * Cubre fallos de render (no de fetch: esos van a ErrorScreen).
+ */
 export class AppErrorBoundary extends Component<
   AppErrorBoundaryProps,
   AppErrorBoundaryState

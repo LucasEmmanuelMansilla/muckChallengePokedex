@@ -18,6 +18,11 @@ type PokedexScreenProps = {
   children: ReactNode;
 };
 
+/**
+ * Insets a mano en vez de react-native-safe-area-context (lib extra).
+ * SafeAreaView de RN es iOS; en Android edge-to-edge hay que reservar
+ * status bar y la barra de 3 botones o el listado queda debajo.
+ */
 export function PokedexScreen({ header, children }: PokedexScreenProps) {
   return (
     <View style={[styles.root, { paddingTop: statusBarInset() }]}>

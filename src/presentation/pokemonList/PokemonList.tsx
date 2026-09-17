@@ -40,6 +40,7 @@ export function PokemonList({
         pokemon.length === 0 ? styles.listFill : null,
       ]}
       renderItem={renderItem}
+      // Si falló "cargar más", no seguir pidiendo al llegar al fondo.
       onEndReached={loadMoreFailed ? undefined : onLoadMore}
       onEndReachedThreshold={0.2}
       ListEmptyComponent={
@@ -59,6 +60,8 @@ export function PokemonList({
           />
         ) : undefined
       }
+      // Ventana chica a propósito: 20+ cards con sprites remotas en Android
+      // de gama baja. Los defaults de FlatList dejan demasiadas celdas vivas.
       initialNumToRender={10}
       maxToRenderPerBatch={8}
       updateCellsBatchingPeriod={50}

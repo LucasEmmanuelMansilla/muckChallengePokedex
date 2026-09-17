@@ -18,6 +18,8 @@ export class CachingHttpClient implements HttpClient {
       return Promise.resolve(cached as T);
     }
 
+    // Strict Mode y listado+ficha pueden disparar el mismo GET a la vez;
+    // compartir la Promise evita un segundo round-trip idéntico.
     const pending = this.inflight.get(key);
     if (pending) {
       return pending as Promise<T>;
@@ -47,6 +49,7 @@ function requestKey(
   }
 
   const params = Object.entries(query)
+    // Orden estable: `{limit,offset}` y `{offset,limit}` son la misma request.
     .sort(([left], [right]) => left.localeCompare(right))
     .map(([name, value]) => `${name}=${value}`)
     .join('&');

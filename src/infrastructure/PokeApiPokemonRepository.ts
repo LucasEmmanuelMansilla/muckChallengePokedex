@@ -75,6 +75,10 @@ type AbilityApiResponse = {
   names: LocalizedName[];
 };
 
+/**
+ * Único archivo que habla el dialecto de PokéAPI (snake_case, dm/hg,
+ * species vs pokemon). El resto de la app trabaja en el modelo de dominio.
+ */
 export class PokeApiPokemonRepository implements PokemonRepository {
   constructor(private readonly httpClient: HttpClient) {}
 
@@ -89,6 +93,8 @@ export class PokeApiPokemonRepository implements PokemonRepository {
   }
 
   async getById(id: number): Promise<PokemonDetail> {
+    // pokemon y species son recursos distintos; en paralelo porque la ficha
+    // necesita ambos y no hay dependencia entre ellos.
     const [pokemon, species] = await Promise.all([
       this.httpClient.get<PokemonApiResponse>(`/pokemon/${id}`),
       this.httpClient.get<PokemonSpeciesApiResponse>(
@@ -145,7 +151,9 @@ export class PokeApiPokemonRepository implements PokemonRepository {
       types: detail.types
         .sort((a, b) => a.slot - b.slot)
         .map(entry => entry.type.name)
+        // Un tipo nuevo de PokéAPI no debe romper chips ni TYPE_COLORS.
         .filter(isPokemonType),
+      // PokéAPI usa decímetros y hectogramos; el dominio habla en SI.
       heightMeters: detail.height / 10,
       weightKilograms: detail.weight / 10,
     };
@@ -158,6 +166,8 @@ export class PokeApiPokemonRepository implements PokemonRepository {
 
     return Promise.all(
       ordered.map(async entry => {
+        // El nombre jugable está en /ability; el resource del Pokémon
+        // solo trae el slug en inglés.
         const ability = await this.httpClient.get<AbilityApiResponse>(
           `/ability/${entry.ability.name}`,
         );
@@ -206,6 +216,7 @@ function pickLocalized<T extends { language: { name: string } }>(
   const byLang = (language: string) =>
     entries.find(entry => entry.language.name === language);
 
+  // Español primero; inglés como fallback estable de PokéAPI.
   const match = byLang('es') ?? byLang('en');
   return match ? read(match) : '';
 }
@@ -215,10 +226,12 @@ function pickFlavorText(
 ): string {
   const byLang = (language: string) =>
     [...entries]
+      // Las entradas más nuevas suelen ser juegos recientes (texto más limpio).
       .reverse()
       .find(entry => entry.language.name === language)?.flavor_text;
 
   const raw = byLang('es') ?? byLang('en') ?? '';
+  // Los flavor text de los juegos traen \f y saltos; la ficha es un párrafo.
   return raw.replace(/[\f\n\r\t]/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
@@ -232,6 +245,8 @@ async function mapPool<T, R>(
   }
 
   const results = new Array<R>(items.length);
+  // Cursor compartido: N workers, orden de `items` intacto (no Promise.all
+  // de 20 ni un for serial).
   let cursor = 0;
 
   async function worker() {
