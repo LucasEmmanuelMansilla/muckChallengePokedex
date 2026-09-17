@@ -4,6 +4,8 @@ Pokédex en React Native CLI: lista los Pokémon de [PokéAPI](https://pokeapi.c
 
 ![Funcionamiento de la aplicación](src/assets/video_description.gif)
 
+[Video que muestra el funcionamiento de la app](src/assets/video.mp4)
+
 ## Requisitos
 
 - Node.js `>= 22.11.0`
