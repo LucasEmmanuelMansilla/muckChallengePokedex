@@ -11,6 +11,10 @@ export type ErrorCopy = {
 const TITLE = '¡La Pokebola se abrió mal!';
 const RETRY_CAPTURE = 'Reintentar captura';
 
+/**
+ * El copy vive aquí y no en dominio: `AppError` es un código, no un texto.
+ * Listado, ficha y render fallan distinto; el código solo no alcanza.
+ */
 export function errorCopy(
   source: ErrorSource | undefined,
   code: AppErrorCode | undefined,

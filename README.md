@@ -66,6 +66,19 @@ presentation / navigation  →  application  →  domain
 
 `App.tsx` arma providers (casos de uso, navegación, ErrorBoundary) y deja el navigator montar pantallas.
 
+### Cómo leer el código
+
+Orden sugerido si es la primera vez en el repo:
+
+1. `App.tsx` y `src/di/container.ts` — composition: qué se instancia y por qué hay dos cachés.
+2. `src/domain` — modelo y puertos. Sin React ni URLs.
+3. `src/application` — casos de uso; reciben el repositorio por constructor.
+4. `src/infrastructure` — PokéAPI, HTTP y persistencia.
+5. `src/navigation` — stack propio y señal de recarga.
+6. `src/presentation` — hooks de vista y pantallas.
+
+Los comentarios en el código explican **por qué** se eligió ese diseño, no qué hace cada línea.
+
 ### Decisiones
 
 - **CLI, no Expo:** el enunciado admite ambos; CLI deja el runtime más cerca de lo que React Native provee (fetch, BackHandler, FlatList) sin capa extra.

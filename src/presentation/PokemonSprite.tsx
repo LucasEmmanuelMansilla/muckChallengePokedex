@@ -7,6 +7,10 @@ type PokemonSpriteProps = {
   size: number;
 };
 
+/**
+ * Los sprites salen del CDN y no se persisten. Sin red, la ficha cacheada
+ * sigue leyéndose y acá se muestra una Pokébola en vez de un hueco roto.
+ */
 export const PokemonSprite = memo(function PokemonSprite({
   uri,
   size,
@@ -21,6 +25,7 @@ export const PokemonSprite = memo(function PokemonSprite({
     <Image
       source={{ uri }}
       style={{ width: size, height: size }}
+      // La card/ficha ya anuncian el Pokémon; el sprite duplicaría el nombre.
       accessible={false}
       onError={() => setFailed(true)}
     />

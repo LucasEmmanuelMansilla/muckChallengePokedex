@@ -13,6 +13,10 @@ import {
   isStatName,
 } from '../domain/pokemonCatalog';
 
+/**
+ * Traducción y formato para humanos. El dominio guarda slugs/unidades SI;
+ * si el catálogo no reconoce un valor, se title-casea en vez de ocultarlo.
+ */
 export function formatPokemonName(name: string): string {
   return name
     .split('-')
@@ -125,6 +129,7 @@ export function formatGender(genderRate: number): string {
     return 'Sin género';
   }
 
+  // PokéAPI: gender_rate en octavos de probabilidad hembra (0–8).
   const female = (genderRate / 8) * 100;
   const male = 100 - female;
 

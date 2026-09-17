@@ -12,6 +12,7 @@ function App() {
       <NavigationProvider>
         <View style={styles.container}>
           <StatusBar barStyle="light-content" />
+          {/* Dentro del navigator para que Reintentar no resetee el stack. */}
           <AppErrorBoundary>
             <RootNavigator />
           </AppErrorBoundary>

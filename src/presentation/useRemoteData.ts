@@ -3,6 +3,11 @@ import { toAppError } from '../domain/AppError';
 import { useNavigation } from '../navigation/NavigationContext';
 import { useReloadSignal } from '../navigation/ReloadContext';
 
+/**
+ * Fetching sin React Query: un recurso, una key, un error que sube al
+ * navigator. Los errores no se pintan inline para no duplicar la pantalla
+ * de error entre listado y ficha.
+ */
 export function useRemoteData<T>(
   load: () => Promise<T>,
   resourceKey: string | number,
@@ -19,6 +24,7 @@ export function useRemoteData<T>(
 
   useEffect(() => {
     let cancelled = false;
+    // Si ya hay dato (reintento de la misma key), no blanquear con spinner.
     if (dataRef.current === undefined) {
       setIsLoading(true);
     }
@@ -26,6 +32,7 @@ export function useRemoteData<T>(
     loadRef
       .current()
       .then(result => {
+        // Strict Mode y unmount al navegar: ignorar respuestas huérfanas.
         if (cancelled) {
           return;
         }

@@ -12,6 +12,10 @@ type ReloadValue = {
   bumpReload: () => void;
 };
 
+/**
+ * Señal, no callback al hook concreto. ErrorScreen no sabe si falló el
+ * listado o la ficha; incrementa un contador y quien esté montado reacciona.
+ */
 const ReloadContext = createContext<ReloadValue | null>(null);
 
 export function ReloadProvider({ children }: { children: ReactNode }) {

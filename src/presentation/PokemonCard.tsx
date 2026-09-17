@@ -14,6 +14,8 @@ type PokemonCardProps = {
   onPress: (pokemonId: number) => void;
 };
 
+// memo: FlatList re-renderiza la ventana al paginar; la card no depende
+// de estado de lista más que `pokemon` y el handler estable.
 export const PokemonCard = memo(function PokemonCard({
   pokemon,
   onPress,

@@ -11,6 +11,7 @@ export function usePokemonDetail(id: number) {
 
   return {
     pokemon: data,
+    // Si ya hay ficha, un refetch no debe sustituirla por el spinner.
     isLoading: isLoading && !data,
   };
 }

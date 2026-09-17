@@ -60,6 +60,7 @@ export const TYPE_LABELS: Record<PokemonType, string> = {
 const FALLBACK_TYPE_COLOR = TYPE_COLORS.normal;
 
 export function typeColor(type: string): string {
+  // El adapter ya filtra, pero un slug suelto no debe pintar un chip sin color.
   return isPokemonType(type) ? TYPE_COLORS[type] : FALLBACK_TYPE_COLOR;
 }
 

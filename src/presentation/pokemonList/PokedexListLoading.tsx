@@ -11,6 +11,7 @@ export function PokedexListLoading() {
       accessibilityLabel="Cargando Pokédex…"
       accessibilityLiveRegion="polite"
     >
+      {/* 6 placeholders llenan el primer viewport; no simulan un total. */}
       {Array.from({ length: 6 }, (_, index) => (
         <SkeletonCard key={index} />
       ))}
@@ -47,6 +48,8 @@ function usePulseOpacity() {
     let animation: Animated.CompositeAnimation | undefined;
 
     AccessibilityInfo.isReduceMotionEnabled().then(reduceMotion => {
+      // Un loop infinito de opacidad es peor que el fade de entrada si
+      // el sistema pide menos movimiento.
       if (cancelled || reduceMotion) {
         return;
       }

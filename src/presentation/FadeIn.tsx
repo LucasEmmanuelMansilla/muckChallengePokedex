@@ -5,6 +5,10 @@ type FadeInProps = {
   children: ReactNode;
 };
 
+/**
+ * Reduce Motion gana: un fade de 220ms no aporta si el sistema pide
+ * menos movimiento, y Animated seguiría corriendo igual.
+ */
 export function FadeIn({ children }: FadeInProps) {
   const opacity = useRef(new Animated.Value(0)).current;
 
