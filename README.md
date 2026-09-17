@@ -2,6 +2,8 @@
 
 Pokédex en React Native CLI: lista los Pokémon de [PokéAPI](https://pokeapi.co), abre una ficha de detalle y funciona de forma parcial sin red una vez cacheada.
 
+![Funcionamiento de la aplicación](src/assets/video_description.gif)
+
 ## Requisitos
 
 - Node.js `>= 22.11.0`
@@ -92,17 +94,12 @@ Los **sprites no se persisten**: salen del CDN de GitHub. Sin red, los textos de
 
 El stack vive en memoria (`Home` → `ficha` → `Error`) y las pantallas previas quedan montadas con `display: none`. Así, volver desde la ficha no re-pide las 20 cards ni pierde el scroll. El hardware back en Android está cableado a `goBack` / `retry`.
 
-La recarga de datos no es navegación: `ReloadProvider` incrementa un contador; los hooks de listado y ficha lo escuchan. Un error de ficha no vacía el listado ya visible.
 
 ## Trade-offs y pendientes
 
 - Offline parcial: textos cacheados, sprites del CDN. Persistir imágenes exigiría otra lib o un store de archivos.
 - Navigator propio: no hay deep links ni historial nativo del sistema. Si el stack creciera, habría que replantearlo.
 - HTTP y caché usan `as T` en el JSON: sin validador runtime (Zod sería otra lib). El adapter filtra vocabularios desconocidos (tipo, stat, hábitat, grupo huevo).
-- Generación y ritmo de crecimiento quedan como `string`: PokéAPI suma generaciones; un valor nuevo se muestra formateado en vez de descartarse.
-- Insets nativos a mano (sin `react-native-safe-area-context`): status bar + barra Android 48 dp + home indicator iOS ~34 pt.
-- No hay búsqueda, filtro por tipo ni selector de generación.
-- Evidencia visual (capturas o video corto) queda para el README de entrega si se quiere adjuntar.
 
 ## Accesibilidad
 
